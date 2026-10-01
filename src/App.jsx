@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import pubmat from "./assets/pubmat.jpg";
 import ChairLabel from "./components/ChairLabel";
 import Glitch from "./components/Glitch";
+import Queue from "./components/Queue";
 import TakeSeat from "./components/TakeSeat";
 import Terminal from "./components/Terminal";
 import { CONFIG } from "./config";
@@ -94,6 +95,8 @@ export default function App() {
 
   const terminalOpen = phase === "terminal" || phase === "closing";
   const pubmatClass = ["pubmat", phase === "breach" && "breach", shake && "shake"].filter(Boolean).join(" ");
+
+  if (phase === "queue") return <Queue onDone={() => setPhase("done")} />;
 
   return (
     <main className="page">
