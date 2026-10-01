@@ -6,6 +6,7 @@ export default function TakeSeat({ status, onRun }) {
         {status === "ready" && <span className="caret" />}
       </button>
       {status === "running" && <div className="take-seat-out">redirecting to trauma queue…</div>}
+      {status === "done" && <div className="take-seat-out ok">✓ seat taken</div>}
     </div>
   );
 }

@@ -136,6 +136,10 @@ button {
   white-space: nowrap;
 }
 
+.take-seat-out.ok {
+  color: #9be7a5;
+}
+
 @keyframes take-seat-in {
   0% {
     opacity: 0;

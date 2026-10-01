@@ -10,7 +10,7 @@ import { prefersReducedMotion, sleep } from "./utils";
 
 export default function App() {
   const [run, setRun] = useState(0);
-  const [phase, setPhase] = useState("idle"); // idle | breach | terminal | closing | done | queue
+  const [phase, setPhase] = useState("idle"); // idle | breach | terminal | closing | done | queue | applied
   const [glitch, setGlitch] = useState(0);
   const [shake, setShake] = useState(false);
   const [label, setLabel] = useState("");
@@ -93,10 +93,18 @@ export default function App() {
     setPhase("queue");
   }, []);
 
+  const backFromQueue = useCallback(async () => {
+    setSeat("done");
+    setPhase("applied");
+    setGlitch(1);
+    await sleep(prefersReducedMotion() ? 0 : 300);
+    setGlitch(0);
+  }, []);
+
   const terminalOpen = phase === "terminal" || phase === "closing";
   const pubmatClass = ["pubmat", phase === "breach" && "breach", shake && "shake"].filter(Boolean).join(" ");
 
-  if (phase === "queue") return <Queue onDone={() => setPhase("done")} />;
+  if (phase === "queue") return <Queue onDone={backFromQueue} />;
 
   return (
     <main className="page">
@@ -117,11 +125,9 @@ export default function App() {
           </div>
         )}
 
-        {phase === "done" && (
-          <TakeSeat status={seat} onRun={takeSeat} />
-        )}
+        {(phase === "done" || phase === "applied") && <TakeSeat status={seat} onRun={takeSeat} />}
 
-        {phase === "done" && (
+        {(phase === "done" || phase === "applied") && (
           <button className="replay" onClick={() => setRun((r) => r + 1)}>
             replay
           </button>

@@ -128,7 +128,7 @@ export default function Queue({ onDone }) {
                 <h2>It's your turn!</h2>
                 <p>You have 10 minutes to complete your application.</p>
                 <button className="tq-button" onClick={onDone}>
-                  Continue
+                  Complete application
                 </button>
               </>
             )}
