@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import pubmat from "../assets/pubmat.jpg";
 import { QUEUE_SIZE, TIMELINE } from "../queueScript";
 import { sleep } from "../utils";
@@ -20,9 +20,16 @@ export default function Queue({ onDone }) {
   const [countdown, setCountdown] = useState(3);
   const [step, setStep] = useState(TIMELINE[0]);
   const [updatedAt, setUpdatedAt] = useState(clock());
+  const [toast, setToast] = useState(null);
+  const [offline, setOffline] = useState(false);
+  const skipRef = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
+    const interruptible = async (ms) => {
+      const end = Date.now() + ms;
+      while (Date.now() < end && !skipRef.current && !cancelled) await sleep(100);
+    };
 
     async function run() {
       await sleep(800);
@@ -36,10 +43,15 @@ export default function Queue({ onDone }) {
       setStage("line");
       for (const next of TIMELINE) {
         if (cancelled) return;
+        if (skipRef.current) break;
         setStep(next);
         setUpdatedAt(clock());
-        await sleep(next.ms);
+        setToast(next.toast ?? null);
+        setOffline(Boolean(next.disconnect));
+        await interruptible(next.ms);
       }
+      setToast(null);
+      setOffline(false);
       if (!cancelled) setStage("turn");
     }
 
@@ -116,7 +128,29 @@ export default function Queue({ onDone }) {
               <strong>Don't refresh this page.</strong> If you do, you'll lose your place in line.
             </aside>
           )}
+
+          {stage === "line" && (
+            <button className="tq-skip" onClick={() => (skipRef.current = true)}>
+              skip the queue (I've suffered enough)
+            </button>
+          )}
         </main>
+      )}
+
+      {toast && (
+        <div className="tq-toast" role="status">
+          {toast}
+        </div>
+      )}
+
+      {offline && (
+        <div className="tq-modal" role="alertdialog" aria-label="Connection lost">
+          <div className="tq-modal-box">
+            <span className="tq-spinner" />
+            <h3>Connection lost</h3>
+            <p>Trying to reconnect. Please don't close this page.</p>
+          </div>
+        </div>
       )}
     </div>
   );
