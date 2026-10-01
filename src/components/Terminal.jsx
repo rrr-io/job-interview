@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { PROMPT, SCRIPT, TITLE } from "../terminalScript";
-import { sleep } from "../utils";
+import { prefersReducedMotion, sleep } from "../utils";
 import "./Terminal.css";
 
 export default function Terminal({ onEffect, onExit, skipRef }) {
@@ -11,7 +11,7 @@ export default function Terminal({ onEffect, onExit, skipRef }) {
 
   useEffect(() => {
     let cancelled = false;
-    const instant = () => skipRef.current;
+    const instant = () => skipRef.current || prefersReducedMotion();
     const wait = (ms) => sleep(instant() ? 0 : ms);
     const print = (line) => setLines((prev) => [...prev, line]);
 

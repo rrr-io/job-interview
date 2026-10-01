@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { prefersReducedMotion } from "../utils";
 import "./Glitch.css";
 
 const randomSlices = (intensity) =>
@@ -17,7 +18,7 @@ export default function Glitch({ src, intensity }) {
   const [slices, setSlices] = useState([]);
 
   useEffect(() => {
-    if (!intensity) {
+    if (!intensity || prefersReducedMotion()) {
       setSlices([]);
       return;
     }

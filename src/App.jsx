@@ -4,7 +4,7 @@ import ChairLabel from "./components/ChairLabel";
 import Glitch from "./components/Glitch";
 import Terminal from "./components/Terminal";
 import { CONFIG } from "./config";
-import { sleep } from "./utils";
+import { prefersReducedMotion, sleep } from "./utils";
 
 export default function App() {
   const [run, setRun] = useState(0);
@@ -47,7 +47,7 @@ export default function App() {
 
   const typeLabel = useCallback(() => {
     const full = CONFIG.newRole;
-    if (skipRef.current) return setLabel(full);
+    if (skipRef.current || prefersReducedMotion()) return setLabel(full);
     let i = 0;
     clearInterval(labelTimer.current);
     labelTimer.current = setInterval(() => {
@@ -74,7 +74,7 @@ export default function App() {
     setLabel(CONFIG.newRole);
     setPhase("closing");
     setGlitch(1);
-    await sleep(320);
+    await sleep(prefersReducedMotion() ? 0 : 320);
     setGlitch(0);
     setPhase("done");
   }, []);
