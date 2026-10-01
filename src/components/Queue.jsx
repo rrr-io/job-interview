@@ -3,6 +3,7 @@ import pubmat from "../assets/pubmat.jpg";
 import { QUEUE_SIZE, TIMELINE } from "../queueScript";
 import { sleep } from "../utils";
 import Captcha from "./Captcha";
+import SeatMap from "./SeatMap";
 import "./Queue.css";
 
 const clock = () => new Date().toLocaleTimeString("en-GB");
@@ -17,7 +18,7 @@ function PersonIcon() {
 }
 
 export default function Queue({ onDone }) {
-  const [stage, setStage] = useState("loading"); // loading | waiting | line | verify | turn
+  const [stage, setStage] = useState("loading"); // loading | waiting | line | verify | seats
   const [countdown, setCountdown] = useState(3);
   const [step, setStep] = useState(TIMELINE[0]);
   const [updatedAt, setUpdatedAt] = useState(clock());
@@ -62,7 +63,7 @@ export default function Queue({ onDone }) {
     };
   }, []);
 
-  const handleVerified = useCallback(() => setStage("turn"), []);
+  const handleVerified = useCallback(() => setStage("seats"), []);
 
   const progress = Math.min(1, Math.max(0, 1 - step.ahead / QUEUE_SIZE));
 
@@ -123,15 +124,7 @@ export default function Queue({ onDone }) {
               </>
             )}
 
-            {stage === "turn" && (
-              <>
-                <h2>It's your turn!</h2>
-                <p>You have 10 minutes to complete your application.</p>
-                <button className="tq-button" onClick={onDone}>
-                  Complete application
-                </button>
-              </>
-            )}
+            {stage === "seats" && <SeatMap onPick={onDone} />}
           </section>
 
           {(stage === "waiting" || stage === "line") && (

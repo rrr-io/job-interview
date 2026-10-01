@@ -1,0 +1,102 @@
+.seats-timer {
+  margin: -24px -20px 20px;
+  padding: 10px 14px;
+  background: #eef4fd;
+  border-bottom: 1px solid var(--tq-line);
+  font-size: 13px;
+}
+
+.seats-timer strong {
+  font-variant-numeric: tabular-nums;
+}
+
+.seats-count {
+  color: var(--tq-muted);
+}
+
+.seats-map {
+  display: block;
+  width: 100%;
+  max-width: 420px;
+  margin: 12px auto 0;
+}
+
+.seats-stage {
+  fill: var(--tq-ink);
+}
+
+.seats-stage-label {
+  fill: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+}
+
+.seat-taken {
+  fill: #d5d9de;
+}
+
+.seat-free {
+  fill: var(--tq-blue);
+  cursor: pointer;
+  outline: none;
+}
+
+.seat-free:focus-visible circle:last-child {
+  stroke: var(--tq-ink);
+  stroke-width: 2;
+}
+
+.seat-pulse {
+  fill: var(--tq-blue);
+  opacity: 0.25;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: seat-pulse 1.4s ease-out infinite;
+}
+
+.seat-free.picked {
+  fill: #0f9d58;
+}
+
+.seat-free.picked .seat-pulse {
+  animation: none;
+  opacity: 0;
+}
+
+@keyframes seat-pulse {
+  from {
+    transform: scale(0.5);
+    opacity: 0.5;
+  }
+  to {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+.seats-legend {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 8px;
+  color: var(--tq-muted);
+  font-size: 13px;
+}
+
+.seats-legend .dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 4px;
+  vertical-align: -1px;
+  border-radius: 50%;
+}
+
+.dot.free {
+  background: var(--tq-blue);
+}
+
+.dot.taken {
+  background: #d5d9de;
+}
