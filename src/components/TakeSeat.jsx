@@ -5,7 +5,9 @@ export default function TakeSeat({ status, onRun }) {
         <span className="ps1">$</span> take-a-seat
         {status === "ready" && <span className="caret" />}
       </button>
-      {status === "running" && <div className="take-seat-out">redirecting to trauma queue…</div>}
+      {(status === "running" || status === "crashing") && (
+        <div className="take-seat-out">submitting application…</div>
+      )}
       {status === "done" && <div className="take-seat-out ok">✓ seat taken</div>}
     </div>
   );

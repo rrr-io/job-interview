@@ -1,0 +1,121 @@
+.redirect {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  padding: 24px;
+  background: #fff;
+  color: #5f6368;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  animation: redirect-jitter 1.1s steps(1) infinite;
+}
+
+.redirect-body {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.redirect-icon {
+  width: 56px;
+  fill: none;
+  stroke: #9aa0a6;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+.redirect-icon .face {
+  stroke-linecap: round;
+}
+
+.redirect h1 {
+  position: relative;
+  margin: 20px 0 12px;
+  color: #202124;
+  font-size: 26px;
+  font-weight: 500;
+}
+
+.redirect h1::before,
+.redirect h1::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+}
+
+.redirect h1::before {
+  color: #ff0000;
+  animation: redirect-slice 0.9s steps(1) infinite;
+}
+
+.redirect h1::after {
+  color: #00c8ff;
+  animation: redirect-slice 0.9s steps(1) infinite reverse;
+}
+
+.redirect ul {
+  margin: 8px 0 16px;
+  padding-left: 20px;
+}
+
+.redirect code {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+
+.redirect-reload {
+  margin-top: 28px;
+  padding: 9px 22px;
+  background: #1a73e8;
+  color: #fff;
+  border: 0;
+  border-radius: 4px;
+  font: inherit;
+  font-weight: 500;
+}
+
+@keyframes redirect-slice {
+  0% {
+    clip-path: inset(0 0 100% 0);
+  }
+  20% {
+    clip-path: inset(10% 0 60% 0);
+    transform: translateX(-4px);
+  }
+  40% {
+    clip-path: inset(70% 0 5% 0);
+    transform: translateX(5px);
+  }
+  60% {
+    clip-path: inset(0 0 100% 0);
+  }
+  80% {
+    clip-path: inset(40% 0 35% 0);
+    transform: translateX(-3px);
+  }
+}
+
+@keyframes redirect-jitter {
+  0%,
+  100% {
+    transform: none;
+    filter: none;
+  }
+  45% {
+    transform: translateX(-6px);
+    filter: invert(1);
+  }
+  48% {
+    transform: none;
+    filter: none;
+  }
+  80% {
+    transform: skewX(4deg);
+  }
+  83% {
+    transform: none;
+  }
+}

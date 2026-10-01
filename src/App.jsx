@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import pubmat from "./assets/pubmat.jpg";
 import ChairLabel from "./components/ChairLabel";
+import ErrorCascade from "./components/ErrorCascade";
 import Glitch from "./components/Glitch";
 import Queue from "./components/Queue";
+import RedirectError from "./components/RedirectError";
 import TakeSeat from "./components/TakeSeat";
 import Terminal from "./components/Terminal";
 import { CONFIG } from "./config";
@@ -10,11 +12,11 @@ import { prefersReducedMotion, sleep } from "./utils";
 
 export default function App() {
   const [run, setRun] = useState(0);
-  const [phase, setPhase] = useState("idle"); // idle | breach | terminal | closing | done | queue | applied
+  const [phase, setPhase] = useState("idle"); // idle | breach | terminal | closing | done | redirect | queue | applied
   const [glitch, setGlitch] = useState(0);
   const [shake, setShake] = useState(false);
   const [label, setLabel] = useState("");
-  const [seat, setSeat] = useState("ready"); // ready | running | done
+  const [seat, setSeat] = useState("ready"); // ready | running | crashing | done
   const labelTimer = useRef(null);
   const skipRef = useRef(false);
 
@@ -86,10 +88,16 @@ export default function App() {
   const takeSeat = useCallback(async () => {
     const fast = prefersReducedMotion();
     setSeat("running");
-    await sleep(fast ? 0 : 900);
-    setGlitch(1.2);
+    await sleep(fast ? 0 : 800);
+    setSeat("crashing");
+    await sleep(fast ? 600 : 2400);
+    setShake(true);
+    setGlitch(1.4);
     await sleep(fast ? 0 : 450);
     setGlitch(0);
+    setShake(false);
+    setPhase("redirect");
+    await sleep(fast ? 1200 : 2400);
     setPhase("queue");
   }, []);
 
@@ -104,6 +112,7 @@ export default function App() {
   const terminalOpen = phase === "terminal" || phase === "closing";
   const pubmatClass = ["pubmat", phase === "breach" && "breach", shake && "shake"].filter(Boolean).join(" ");
 
+  if (phase === "redirect") return <RedirectError host="apply.emgp" />;
   if (phase === "queue") return <Queue onDone={backFromQueue} />;
 
   return (
@@ -126,6 +135,8 @@ export default function App() {
         )}
 
         {(phase === "done" || phase === "applied") && <TakeSeat status={seat} onRun={takeSeat} />}
+
+        {seat === "crashing" && <ErrorCascade />}
 
         {(phase === "done" || phase === "applied") && (
           <button className="replay" onClick={() => setRun((r) => r + 1)}>
