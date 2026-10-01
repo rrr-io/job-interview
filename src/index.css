@@ -91,3 +91,22 @@ button {
 .chair-label-caret {
   animation: blink 0.7s steps(1) infinite;
 }
+
+/* Mirrors the EMGP mark in the opposite corner */
+.replay {
+  position: absolute;
+  left: 6.5%;
+  bottom: 3.6%;
+  padding: 0.4em 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-family: "Poppins", system-ui, sans-serif;
+  font-size: clamp(9px, 1.9cqw, 13px);
+  letter-spacing: 0.6em;
+  opacity: 0.6;
+}
+
+.replay:hover {
+  opacity: 1;
+}

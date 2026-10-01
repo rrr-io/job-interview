@@ -3,7 +3,7 @@ import { PROMPT, SCRIPT, TITLE } from "../terminalScript";
 import { sleep } from "../utils";
 import "./Terminal.css";
 
-export default function Terminal({ onEffect, onExit }) {
+export default function Terminal({ onEffect, onExit, skipRef }) {
   const [lines, setLines] = useState([]);
   const [typing, setTyping] = useState(null);
   const [progress, setProgress] = useState(null);
@@ -11,43 +11,45 @@ export default function Terminal({ onEffect, onExit }) {
 
   useEffect(() => {
     let cancelled = false;
+    const instant = () => skipRef.current;
+    const wait = (ms) => sleep(instant() ? 0 : ms);
     const print = (line) => setLines((prev) => [...prev, line]);
 
     async function run() {
-      await sleep(450);
+      await wait(450);
       for (const step of SCRIPT) {
         if (cancelled) return;
 
         if (step.cmd) {
           setTyping("");
-          await sleep(280);
-          for (let i = 1; i <= step.cmd.length; i++) {
+          await wait(280);
+          for (let i = 1; i <= step.cmd.length && !instant(); i++) {
             if (cancelled) return;
             setTyping(step.cmd.slice(0, i));
             await sleep(24 + Math.random() * 40);
           }
           setTyping(null);
           print({ kind: "cmd", text: step.cmd });
-          await sleep(180);
+          await wait(180);
         } else if (step.pause) {
           setTyping("");
-          await sleep(step.pause);
+          await wait(step.pause);
         } else if (step.progress) {
           for (let p = 0; p <= 10; p++) {
             if (cancelled) return;
             setProgress(p);
-            await sleep(140);
+            await wait(140);
           }
           setProgress(null);
           print({ kind: "out", text: "[##########] 100%" });
         } else {
           print({ kind: "out", text: step.out, tone: step.tone });
           if (step.effect) onEffect(step.effect);
-          await sleep(step.tone === "err" ? 750 : 120);
+          await wait(step.tone === "err" ? 750 : 120);
         }
       }
       setTyping(null);
-      await sleep(900);
+      await wait(900);
       if (!cancelled) onExit();
     }
 
@@ -55,7 +57,7 @@ export default function Terminal({ onEffect, onExit }) {
     return () => {
       cancelled = true;
     };
-  }, [onEffect, onExit]);
+  }, [onEffect, onExit, skipRef]);
 
   useEffect(() => {
     const body = bodyRef.current;
@@ -66,6 +68,9 @@ export default function Terminal({ onEffect, onExit }) {
     <div className="term" role="log" aria-live="polite" aria-label="Terminal">
       <div className="term-bar">
         <span className="term-title">{TITLE}</span>
+        <button className="term-skip" onClick={() => (skipRef.current = true)}>
+          skip
+        </button>
       </div>
       <div className="term-body" ref={bodyRef}>
         {lines.map((line, i) => (

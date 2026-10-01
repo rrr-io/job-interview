@@ -7,14 +7,19 @@ import { CONFIG } from "./config";
 import { sleep } from "./utils";
 
 export default function App() {
+  const [run, setRun] = useState(0);
   const [phase, setPhase] = useState("idle"); // idle | breach | terminal | closing | done
   const [glitch, setGlitch] = useState(0);
   const [shake, setShake] = useState(false);
   const [label, setLabel] = useState("");
   const labelTimer = useRef(null);
+  const skipRef = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
+    skipRef.current = false;
+    setPhase("idle");
+    setLabel("");
 
     async function breach() {
       await sleep(CONFIG.idleBeforeHack);
@@ -38,10 +43,11 @@ export default function App() {
       setGlitch(0);
       clearInterval(labelTimer.current);
     };
-  }, []);
+  }, [run]);
 
   const typeLabel = useCallback(() => {
     const full = CONFIG.newRole;
+    if (skipRef.current) return setLabel(full);
     let i = 0;
     clearInterval(labelTimer.current);
     labelTimer.current = setInterval(() => {
@@ -91,8 +97,14 @@ export default function App() {
 
         {terminalOpen && (
           <div className={`term-wrap ${phase === "closing" ? "closing" : ""}`}>
-            <Terminal onEffect={handleEffect} onExit={handleExit} />
+            <Terminal key={run} onEffect={handleEffect} onExit={handleExit} skipRef={skipRef} />
           </div>
+        )}
+
+        {phase === "done" && (
+          <button className="replay" onClick={() => setRun((r) => r + 1)}>
+            replay
+          </button>
         )}
       </div>
     </main>
