@@ -88,7 +88,7 @@ export default function App() {
         <img
           className="layer"
           src={pubmat}
-          alt="Enhypen MAMA Grand Prix recruitment pubmat: We're hiring. A chair labelled editor, graphic designer, video editor."
+          alt="Recruitment pubmat: We're hiring."
         />
 
         <ChairLabel text={label} typing={label !== "" && label !== CONFIG.newRole} />
