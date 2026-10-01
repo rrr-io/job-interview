@@ -92,6 +92,64 @@ button {
   animation: blink 0.7s steps(1) infinite;
 }
 
+/* A command left behind by the terminal, under the new role */
+.take-seat {
+  position: absolute;
+  left: 50%;
+  top: 65.5%;
+  min-width: 48%;
+  transform: translateX(-50%);
+  background: #0d0d0f;
+  color: #ededed;
+  border-radius: 1.2cqw;
+  box-shadow: 0 1.4cqw 3cqw rgba(0, 0, 0, 0.3);
+  font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  font-size: clamp(11px, 3cqw, 18px);
+  animation: take-seat-in 0.45s steps(5) 1;
+}
+
+.take-seat-cmd {
+  display: block;
+  width: 100%;
+  padding: 0.6em 1em;
+  background: none;
+  border: 0;
+  border-radius: inherit;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.take-seat.ready .take-seat-cmd:hover {
+  background: #1c1c20;
+}
+
+.take-seat-cmd:disabled {
+  cursor: default;
+}
+
+.take-seat-out {
+  padding: 0 1em 0.6em;
+  color: #8a8a90;
+  white-space: nowrap;
+}
+
+@keyframes take-seat-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scaleY(0.05);
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(-52%) scaleY(1.05) skewX(-6deg);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
 /* Mirrors the EMGP mark in the opposite corner */
 .replay {
   position: absolute;
