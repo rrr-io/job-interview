@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import pubmat from "../assets/pubmat.jpg";
 import { QUEUE_SIZE, TIMELINE } from "../queueScript";
 import { sleep } from "../utils";
+import Captcha from "./Captcha";
 import "./Queue.css";
 
 const clock = () => new Date().toLocaleTimeString("en-GB");
@@ -16,7 +17,7 @@ function PersonIcon() {
 }
 
 export default function Queue({ onDone }) {
-  const [stage, setStage] = useState("loading"); // loading | waiting | line | turn
+  const [stage, setStage] = useState("loading"); // loading | waiting | line | verify | turn
   const [countdown, setCountdown] = useState(3);
   const [step, setStep] = useState(TIMELINE[0]);
   const [updatedAt, setUpdatedAt] = useState(clock());
@@ -52,7 +53,7 @@ export default function Queue({ onDone }) {
       }
       setToast(null);
       setOffline(false);
-      if (!cancelled) setStage("turn");
+      if (!cancelled) setStage("verify");
     }
 
     run();
@@ -60,6 +61,8 @@ export default function Queue({ onDone }) {
       cancelled = true;
     };
   }, []);
+
+  const handleVerified = useCallback(() => setStage("turn"), []);
 
   const progress = Math.min(1, Math.max(0, 1 - step.ahead / QUEUE_SIZE));
 
@@ -112,6 +115,14 @@ export default function Queue({ onDone }) {
               </>
             )}
 
+            {stage === "verify" && (
+              <>
+                <h2>Almost there</h2>
+                <p>Before you continue, confirm you're not a bot.</p>
+                <Captcha onVerified={handleVerified} />
+              </>
+            )}
+
             {stage === "turn" && (
               <>
                 <h2>It's your turn!</h2>
@@ -123,7 +134,7 @@ export default function Queue({ onDone }) {
             )}
           </section>
 
-          {stage !== "turn" && (
+          {(stage === "waiting" || stage === "line") && (
             <aside className="tq-warning">
               <strong>Don't refresh this page.</strong> If you do, you'll lose your place in line.
             </aside>
