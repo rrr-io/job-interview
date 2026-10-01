@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import pubmat from "./assets/pubmat.jpg";
+import ChairLabel from "./components/ChairLabel";
 import Glitch from "./components/Glitch";
 import Terminal from "./components/Terminal";
 import { CONFIG } from "./config";
@@ -8,6 +9,9 @@ import { sleep } from "./utils";
 export default function App() {
   const [phase, setPhase] = useState("idle"); // idle | breach | terminal | closing | done
   const [glitch, setGlitch] = useState(0);
+  const [shake, setShake] = useState(false);
+  const [label, setLabel] = useState("");
+  const labelTimer = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -32,10 +36,36 @@ export default function App() {
     return () => {
       cancelled = true;
       setGlitch(0);
+      clearInterval(labelTimer.current);
     };
   }, []);
 
+  const typeLabel = useCallback(() => {
+    const full = CONFIG.newRole;
+    let i = 0;
+    clearInterval(labelTimer.current);
+    labelTimer.current = setInterval(() => {
+      setLabel(full.slice(0, ++i));
+      if (i >= full.length) clearInterval(labelTimer.current);
+    }, 95);
+  }, []);
+
+  const handleEffect = useCallback(
+    (effect) => {
+      if (effect === "shake") {
+        setShake(true);
+        setGlitch(0.8);
+        setTimeout(() => setGlitch(0), 260);
+        setTimeout(() => setShake(false), 420);
+      }
+      if (effect === "label") typeLabel();
+    },
+    [typeLabel]
+  );
+
   const handleExit = useCallback(async () => {
+    clearInterval(labelTimer.current);
+    setLabel(CONFIG.newRole);
     setPhase("closing");
     setGlitch(1);
     await sleep(320);
@@ -44,21 +74,24 @@ export default function App() {
   }, []);
 
   const terminalOpen = phase === "terminal" || phase === "closing";
+  const pubmatClass = ["pubmat", phase === "breach" && "breach", shake && "shake"].filter(Boolean).join(" ");
 
   return (
     <main className="page">
-      <div className={`pubmat ${phase === "breach" ? "breach" : ""}`}>
+      <div className={pubmatClass}>
         <img
           className="layer"
           src={pubmat}
           alt="Enhypen MAMA Grand Prix recruitment pubmat: We're hiring. A chair labelled editor, graphic designer, video editor."
         />
 
+        <ChairLabel text={label} typing={label !== "" && label !== CONFIG.newRole} />
+
         <Glitch src={pubmat} intensity={glitch} />
 
         {terminalOpen && (
           <div className={`term-wrap ${phase === "closing" ? "closing" : ""}`}>
-            <Terminal onExit={handleExit} />
+            <Terminal onEffect={handleEffect} onExit={handleExit} />
           </div>
         )}
       </div>

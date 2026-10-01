@@ -62,3 +62,32 @@ button {
   user-select: none;
   -webkit-user-drag: none;
 }
+
+.shake {
+  animation: shake 0.4s linear 1;
+}
+
+@keyframes shake {
+  20% {
+    transform: translate(-1.2%, 0.4%);
+  }
+  40% {
+    transform: translate(1%, -0.6%);
+  }
+  60% {
+    transform: translate(-0.6%, 0.2%);
+  }
+  80% {
+    transform: translate(0.8%, 0);
+  }
+}
+
+.chair-label {
+  font-family: "Libre Baskerville", Georgia, serif;
+  font-size: 27px;
+  fill: #fff;
+}
+
+.chair-label-caret {
+  animation: blink 0.7s steps(1) infinite;
+}

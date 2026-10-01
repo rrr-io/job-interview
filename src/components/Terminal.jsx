@@ -3,7 +3,7 @@ import { PROMPT, SCRIPT, TITLE } from "../terminalScript";
 import { sleep } from "../utils";
 import "./Terminal.css";
 
-export default function Terminal({ onExit }) {
+export default function Terminal({ onEffect, onExit }) {
   const [lines, setLines] = useState([]);
   const [typing, setTyping] = useState(null);
   const [progress, setProgress] = useState(null);
@@ -42,6 +42,7 @@ export default function Terminal({ onExit }) {
           print({ kind: "out", text: "[##########] 100%" });
         } else {
           print({ kind: "out", text: step.out, tone: step.tone });
+          if (step.effect) onEffect(step.effect);
           await sleep(step.tone === "err" ? 750 : 120);
         }
       }
@@ -54,7 +55,7 @@ export default function Terminal({ onExit }) {
     return () => {
       cancelled = true;
     };
-  }, [onExit]);
+  }, [onEffect, onExit]);
 
   useEffect(() => {
     const body = bodyRef.current;

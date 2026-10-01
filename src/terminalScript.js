@@ -5,7 +5,8 @@ const { user, host, newRole } = CONFIG;
 export const PROMPT = `${user}@emgp:~$ `;
 export const TITLE = `${user}@${host}: ~/hiring_post`;
 
-// Steps: cmd (typed), out (printed), pause (ms), progress (progress bar)
+// Steps: cmd (typed), out (printed), pause (ms), progress (progress bar).
+// An out step can trigger an effect on the pubmat.
 export const SCRIPT = [
   { cmd: `ssh ${user}@${host}` },
   { out: `Warning: Permanently added '${host}' to the list of known hosts.` },
@@ -19,7 +20,7 @@ export const SCRIPT = [
   { pause: 500 },
   { cmd: "echo $?" },
   { out: "1" },
-  { out: "ERROR 404: position WEB_DEVELOPER not found", tone: "err" },
+  { out: "ERROR 404: position WEB_DEVELOPER not found", tone: "err", effect: "shake" },
   { cmd: "mkdir open_positions/WEB_DEVELOPER" },
   { out: "mkdir: open_positions/WEB_DEVELOPER: Permission denied", tone: "err" },
   { cmd: "sudo !!" },
@@ -27,7 +28,7 @@ export const SCRIPT = [
   { out: "created open_positions/WEB_DEVELOPER", tone: "ok" },
   { cmd: `./patch.sh hiring_post.png --add-label "${newRole}"` },
   { out: "scanning chair... 3 labels detected" },
-  { out: "writing label 4/4" },
+  { out: "writing label 4/4", effect: "label" },
   { progress: true },
   { out: "hiring_post.png patched", tone: "ok" },
   { cmd: 'git commit -am "fix: hiring post was missing a position"' },
