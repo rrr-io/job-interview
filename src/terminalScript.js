@@ -79,3 +79,12 @@ export const RESUME_STEPS = [
   { out: "Manual configuration required." },
   { pause: 600, effect: "flag" },
 ];
+
+export const CLEAN_STEPS = [
+  { cmd: "./customize-seat.sh" },
+  { out: "Cleaning workspace..." },
+  { pause: 700 },
+  { out: "ERROR: automatic cleanup failed", tone: "err" },
+  { out: "Clean it yourself." },
+  { pause: 1100, effect: "close" },
+];

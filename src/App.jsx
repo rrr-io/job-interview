@@ -11,7 +11,7 @@ import Terminal from "./components/Terminal";
 import WorkspacePopup from "./components/WorkspacePopup";
 import { CONFIG } from "./config";
 import { DEFAULT_FACE, ERASER_FACES } from "./erasers";
-import { HACK_STEPS, RESUME_START, RESUME_STEPS, SUBMIT_STEPS } from "./terminalScript";
+import { CLEAN_STEPS, HACK_STEPS, RESUME_START, RESUME_STEPS, SUBMIT_STEPS } from "./terminalScript";
 import { prefersReducedMotion, sleep } from "./utils";
 
 export default function App() {
@@ -23,6 +23,8 @@ export default function App() {
   const [seat, setSeat] = useState("ready"); // ready | crashing | done
   const [termSteps, setTermSteps] = useState(HACK_STEPS);
   const [flagged, setFlagged] = useState(false);
+  const [resumeSteps, setResumeSteps] = useState(RESUME_STEPS);
+  const [closing, setClosing] = useState(false);
   const labelTimer = useRef(null);
   const skipRef = useRef(false);
   const [painted, setPainted] = useState(false);
@@ -36,6 +38,8 @@ export default function App() {
     setSeat("ready");
     setTermSteps(HACK_STEPS);
     setFlagged(false);
+    setResumeSteps(RESUME_STEPS);
+    setClosing(false);
     setPainted(false);
 
     async function breach() {
@@ -118,14 +122,25 @@ export default function App() {
     setPhase("erase");
   }, []);
 
-  const handleResumeEffect = useCallback((effect) => {
-    if (effect === "flag") setFlagged(true);
-  }, []);
+  // "Clean it yourself": the window closes and the eraser takes over
+  const closeTerminal = useCallback(async () => {
+    setClosing(true);
+    await sleep(prefersReducedMotion() ? 0 : 320);
+    toEraser();
+  }, [toEraser]);
+
+  const handleResumeEffect = useCallback(
+    (effect) => {
+      if (effect === "flag") setFlagged(true);
+      if (effect === "close") closeTerminal();
+    },
+    [closeTerminal]
+  );
 
   const customize = useCallback(() => {
     setFlagged(false);
-    toEraser();
-  }, [toEraser]);
+    setResumeSteps((steps) => [...steps, ...CLEAN_STEPS]);
+  }, []);
 
   const handlePainted = useCallback(() => setPainted(true), []);
   const handleErased = useCallback(() => setPhase("clean"), []);
@@ -156,8 +171,8 @@ export default function App() {
         )}
 
         {phase === "applied" && (
-          <div className="term-wrap">
-            <Terminal key={`resume-${run}`} steps={RESUME_STEPS} start={RESUME_START} onEffect={handleResumeEffect} />
+          <div className={`term-wrap ${closing ? "closing" : ""}`}>
+            <Terminal key={`resume-${run}`} steps={resumeSteps} start={RESUME_START} onEffect={handleResumeEffect} />
           </div>
         )}
 
