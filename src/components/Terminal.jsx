@@ -58,7 +58,7 @@ export default function Terminal({ steps, start = START, onEffect, onIdle, skipR
         for (let i = 1; i <= step.cmd.length && !instant(); i++) {
           if (!alive.current) return;
           setTyping(step.cmd.slice(0, i));
-          await sleep(40 + Math.random() * 55);
+          await sleep(35 + Math.random() * 30);
         }
         setTyping(null);
         if (step.clear) {
