@@ -8,6 +8,7 @@ import Glitch from "./components/Glitch";
 import Queue from "./components/Queue";
 import RedirectError from "./components/RedirectError";
 import Terminal from "./components/Terminal";
+import WorkspacePopup from "./components/WorkspacePopup";
 import { CONFIG } from "./config";
 import { DEFAULT_FACE, ERASER_FACES } from "./erasers";
 import { HACK_STEPS, RESUME_START, RESUME_STEPS, SUBMIT_STEPS } from "./terminalScript";
@@ -21,6 +22,7 @@ export default function App() {
   const [label, setLabel] = useState("");
   const [seat, setSeat] = useState("ready"); // ready | crashing | done
   const [termSteps, setTermSteps] = useState(HACK_STEPS);
+  const [flagged, setFlagged] = useState(false);
   const labelTimer = useRef(null);
   const skipRef = useRef(false);
   const [painted, setPainted] = useState(false);
@@ -33,6 +35,7 @@ export default function App() {
     setLabel("");
     setSeat("ready");
     setTermSteps(HACK_STEPS);
+    setFlagged(false);
     setPainted(false);
 
     async function breach() {
@@ -115,10 +118,13 @@ export default function App() {
     setPhase("erase");
   }, []);
 
-  const idleTimer = useRef(null);
-  useEffect(() => () => clearTimeout(idleTimer.current), []);
-  const handleResumeIdle = useCallback(() => {
-    idleTimer.current = setTimeout(toEraser, 1600);
+  const handleResumeEffect = useCallback((effect) => {
+    if (effect === "flag") setFlagged(true);
+  }, []);
+
+  const customize = useCallback(() => {
+    setFlagged(false);
+    toEraser();
   }, [toEraser]);
 
   const handlePainted = useCallback(() => setPainted(true), []);
@@ -151,7 +157,7 @@ export default function App() {
 
         {phase === "applied" && (
           <div className="term-wrap">
-            <Terminal key={`resume-${run}`} steps={RESUME_STEPS} start={RESUME_START} onIdle={handleResumeIdle} />
+            <Terminal key={`resume-${run}`} steps={RESUME_STEPS} start={RESUME_START} onEffect={handleResumeEffect} />
           </div>
         )}
 
@@ -160,6 +166,8 @@ export default function App() {
         )}
 
         {seat === "crashing" && <ErrorCascade />}
+
+        {phase === "applied" && flagged && <WorkspacePopup onCustomize={customize} />}
 
         {phase === "clean" && (
           <button className="replay" onClick={() => setRun((r) => r + 1)}>
