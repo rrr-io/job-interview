@@ -4,27 +4,37 @@ const { user, host, newRole } = CONFIG;
 
 const position = newRole.replace(/ /g, "_");
 
+// "Last login: Thu Oct  1 22:14:03 2026", from yesterday evening
+const lastLogin = () => {
+  const d = new Date(Date.now() - 86400000);
+  d.setHours(22, 14, 3);
+  const day = d.toLocaleDateString("en-US", { weekday: "short" });
+  const month = d.toLocaleDateString("en-US", { month: "short" });
+  return `${day} ${month} ${String(d.getDate()).padStart(2)} 22:14:03 ${d.getFullYear()}`;
+};
+
+const dir = (name) => `drwxr-xr-x 2 emgp emgp 4096 Sep 28 18:04 ${name}`;
+
 // The hacking session, from the laptop into the recruitment server
 export const HACK_STEPS = [
   { cmd: `ssh ${user}@${host}`, then: { host } },
-  { out: `Warning: Permanently added '${host}' to the list of known hosts.` },
-  { out: `Last login: ${new Date().toDateString()} from 127.0.0.1`, tone: "dim" },
+  { out: `Warning: Permanently added '${host}' (ED25519) to the list of known hosts.` },
+  { out: `Last login: ${lastLogin()} from 192.168.1.23`, tone: "dim" },
   { cmd: "cd hiring_post", then: { cwd: "~/hiring_post" } },
   { cmd: "ls -l open_positions/" },
-  { out: "total 3", tone: "dim" },
-  { out: "drwxr-xr-x  2 emgp  staff  64  EDITOR" },
-  { out: "drwxr-xr-x  2 emgp  staff  64  GRAPHIC_DESIGNER" },
-  { out: "drwxr-xr-x  2 emgp  staff  64  VIDEO_EDITOR" },
+  { out: "total 12" },
+  { out: dir("EDITOR") },
+  { out: dir("GRAPHIC_DESIGNER") },
+  { out: dir("VIDEO_EDITOR") },
   { cmd: 'grep -rli "web developer" .' },
-  { pause: 500 },
-  { cmd: "echo $?" },
-  { out: "1" },
+  { pause: 600 },
+  { cmd: "./check_position.sh web_developer" },
   { out: "ERROR 404: position WEB_DEVELOPER not found", tone: "err", effect: "shake" },
   { cmd: "mkdir open_positions/WEB_DEVELOPER" },
-  { out: "mkdir: open_positions/WEB_DEVELOPER: Permission denied", tone: "err" },
+  { out: "mkdir: cannot create directory 'open_positions/WEB_DEVELOPER': Permission denied", tone: "err" },
   { cmd: "sudo !!" },
-  { out: `[sudo] password for ${user}: ********`, tone: "dim" },
-  { out: "created open_positions/WEB_DEVELOPER", tone: "ok" },
+  { out: "sudo mkdir open_positions/WEB_DEVELOPER" },
+  { out: `[sudo] password for ${user}:`, tone: "dim" },
   { cmd: `./patch.sh hiring_post.png --add-label "${newRole}"` },
   { out: "scanning chair... 3 labels detected" },
   { out: "writing label 4/4", effect: "label" },
@@ -32,7 +42,7 @@ export const HACK_STEPS = [
   { out: "hiring_post.png patched", tone: "ok" },
   { cmd: 'git commit -am "fix: hiring post was missing a position"' },
   { out: "[main 3f7c2a1] fix: hiring post was missing a position" },
-  { out: " 1 file changed, 1 insertion(+)", tone: "dim" },
+  { out: " 1 file changed, 0 insertions(+), 0 deletions(-)", tone: "dim" },
   { cmd: "clear", clear: true },
   { cmd: "./recruitment_patch.sh --status" },
   { out: "Position successfully added.", tone: "ok" },
