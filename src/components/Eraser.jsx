@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import pubmat from "../assets/pubmat.jpg";
 import chairOnly from "../assets/pubmat-chair-only.jpg";
+import { DEFAULT_FACE } from "../erasers";
+import "./ErrorCascade.css";
 import "./Eraser.css";
 
 const W = 1080;
@@ -8,6 +10,7 @@ const H = 1350;
 const BRUSH = 110;
 const DONE_AT = 0.8;
 const STRIDE = 4;
+const CHAIR_HITS = 18;
 
 const loadImage = (src) =>
   new Promise((resolve) => {
@@ -62,7 +65,7 @@ function paintLeftovers(ctx, pubmatEl, label) {
   });
 }
 
-export default function Eraser({ label, pubmatRef, onPainted, onDone }) {
+export default function Eraser({ face = DEFAULT_FACE, label, pubmatRef, onPainted, onDone }) {
   const canvasRef = useRef(null);
   const maskRef = useRef([]);
   const baseRef = useRef(null);
@@ -75,6 +78,9 @@ export default function Eraser({ label, pubmatRef, onPainted, onDone }) {
   const [progress, setProgress] = useState(0);
   const [fading, setFading] = useState(false);
   const [lazy, setLazy] = useState(false);
+  const contentRef = useRef(null);
+  const chairHits = useRef(0);
+  const [protectedChair, setProtectedChair] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -97,14 +103,19 @@ export default function Eraser({ label, pubmatRef, onPainted, onDone }) {
       baseRef.current = baseData;
 
       const mask = [];
+      const content = new Uint8Array(W * H);
       for (let y = 0; y < H; y += STRIDE) {
         for (let x = 0; x < W; x += STRIDE) {
           const i = (y * W + x) * 4;
           const diff = Math.abs(top[i] - baseData[i]) + Math.abs(top[i + 1] - baseData[i + 1]) + Math.abs(top[i + 2] - baseData[i + 2]);
-          if (diff > 90) mask.push(i);
+          if (diff > 90) {
+            mask.push(i);
+            content[y * W + x] = 1;
+          }
         }
       }
       maskRef.current = mask;
+      contentRef.current = content;
       onPainted();
     }
 
@@ -157,6 +168,35 @@ export default function Eraser({ label, pubmatRef, onPainted, onDone }) {
     last.current = p;
   };
 
+  // Scrubbing a bit of chair with nothing left to erase on it
+  const checkChair = (p) => {
+    const base = baseRef.current;
+    const content = contentRef.current;
+    if (!base || !content || protectedChair) return;
+    const cx = Math.round(p.x);
+    const cy = Math.round(p.y);
+    const i = (cy * W + cx) * 4;
+    const isChair = base[i] + base[i + 1] + base[i + 2] < 210;
+    if (!isChair) return;
+
+    const r = BRUSH / 2;
+    const x0 = Math.max(0, cx - r);
+    const y0 = Math.max(0, cy - r);
+    const area = canvasRef.current.getContext("2d", { willReadFrequently: true }).getImageData(x0, y0, BRUSH, BRUSH).data;
+    for (let y = y0 - (y0 % STRIDE); y < y0 + BRUSH && y < H; y += STRIDE) {
+      for (let x = x0 - (x0 % STRIDE); x < x0 + BRUSH && x < W; x += STRIDE) {
+        if (x < x0 || y < y0 || !content[y * W + x]) continue;
+        if (area[((y - y0) * BRUSH + (x - x0)) * 4 + 3] > 100) return;
+      }
+    }
+
+    if (++chairHits.current >= CHAIR_HITS) {
+      setProtectedChair(true);
+      setTimeout(() => setProtectedChair(false), 2600);
+      chairHits.current = -1000;
+    }
+  };
+
   const down = (e) => {
     if (finished.current) return;
     e.preventDefault();
@@ -174,6 +214,7 @@ export default function Eraser({ label, pubmatRef, onPainted, onDone }) {
     const p = toCanvas(e);
     setCursor({ x: p.px, y: p.py });
     stroke(p);
+    checkChair(p);
     if (++moves.current % 10 === 0) measure();
   };
 
@@ -200,14 +241,8 @@ export default function Eraser({ label, pubmatRef, onPainted, onDone }) {
       />
 
       {!fading && (
-        <div className={`eraser ${dragging ? "dragging" : ""}`} style={{ left: `${cursor.x}%`, top: `${cursor.y}%` }} aria-hidden="true">
-          <svg viewBox="0 0 160 80">
-            <rect x="4" y="10" width="152" height="60" rx="12" fill="#f39ab0" stroke="#b9506c" strokeWidth="3" />
-            <rect x="62" y="10" width="94" height="60" fill="#fff" stroke="#b9506c" strokeWidth="3" />
-            <text x="109" y="47" textAnchor="middle" fontFamily="Poppins, sans-serif" fontWeight="700" fontSize="20" fill="#ff0000">
-              ERASE
-            </text>
-          </svg>
+        <div className={`eraser ${dragging ? "dragging" : ""} ${protectedChair ? "bonk" : ""}`} style={{ left: `${cursor.x}%`, top: `${cursor.y}%` }} aria-hidden="true">
+          <img className="eraser-face" src={face} alt="" draggable="false" />
           {!dragging && progress === 0 && <span className="eraser-hint">drag me</span>}
         </div>
       )}
@@ -215,6 +250,26 @@ export default function Eraser({ label, pubmatRef, onPainted, onDone }) {
       {!fading && (
         <div className="erase-meter" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round((progress / DONE_AT) * 100)}>
           <span style={{ width: `${Math.min(100, (progress / DONE_AT) * 100)}%` }} />
+        </div>
+      )}
+
+      {protectedChair && (
+        <div className="error-popup chair-popup" role="alert">
+          <div className="error-title">
+            <span>Error</span>
+            <span className="error-close" aria-hidden="true">
+              ×
+            </span>
+          </div>
+          <div className="error-body">
+            <span className="error-icon" aria-hidden="true">
+              !
+            </span>
+            <p>You can't delete the chair. It's taken.</p>
+          </div>
+          <div className="error-actions">
+            <span className="error-ok">OK</span>
+          </div>
         </div>
       )}
 
