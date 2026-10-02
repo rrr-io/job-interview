@@ -136,6 +136,14 @@ button {
   white-space: nowrap;
 }
 
+.take-seat-out.cmd {
+  color: #ededed;
+}
+
+.take-seat-out.err {
+  color: #ff3b3b;
+}
+
 .take-seat-out.ok {
   color: #9be7a5;
 }

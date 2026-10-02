@@ -16,7 +16,7 @@ export default function App() {
   const [glitch, setGlitch] = useState(0);
   const [shake, setShake] = useState(false);
   const [label, setLabel] = useState("");
-  const [seat, setSeat] = useState("ready"); // ready | running | crashing | done
+  const [seat, setSeat] = useState("ready"); // ready | running | crashing | done | clearing | failed
   const labelTimer = useRef(null);
   const skipRef = useRef(false);
 
@@ -109,6 +109,17 @@ export default function App() {
     setGlitch(0);
   }, []);
 
+  useEffect(() => {
+    if (phase !== "applied" || seat !== "done") return;
+    const timer = setTimeout(() => setSeat("clearing"), 1500);
+    return () => clearTimeout(timer);
+  }, [phase, seat]);
+
+  const handleClearTyped = useCallback(async () => {
+    await sleep(350);
+    setSeat("failed");
+  }, []);
+
   const terminalOpen = phase === "terminal" || phase === "closing";
   const pubmatClass = ["pubmat", phase === "breach" && "breach", shake && "shake"].filter(Boolean).join(" ");
 
@@ -134,7 +145,7 @@ export default function App() {
           </div>
         )}
 
-        {(phase === "done" || phase === "applied") && <TakeSeat status={seat} onRun={takeSeat} />}
+        {(phase === "done" || phase === "applied") && <TakeSeat status={seat} onRun={takeSeat} onClearTyped={handleClearTyped} />}
 
         {seat === "crashing" && <ErrorCascade />}
 
