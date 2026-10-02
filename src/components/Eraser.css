@@ -106,9 +106,13 @@
   }
 }
 
+/* Centred over the chair, never wider than the pubmat */
 .chair-popup {
-  left: 19%;
+  left: 0;
+  right: 0;
   top: 40%;
+  width: min(340px, 90%);
+  margin: 0 auto;
   pointer-events: none;
 }
 
