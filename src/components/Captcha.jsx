@@ -15,9 +15,9 @@ export default function Captcha({ onVerified }) {
 
   useEffect(() => {
     if (!verified) return;
-    const timer = setTimeout(onVerified, 1100);
+    const timer = setTimeout(() => onVerified(captcha.member), 1100);
     return () => clearTimeout(timer);
-  }, [verified, onVerified]);
+  }, [verified, onVerified, captcha]);
 
   const toggle = (i) => {
     setError(null);

@@ -63,7 +63,12 @@ export default function Queue({ onDone }) {
     };
   }, []);
 
-  const handleVerified = useCallback(() => setStage("seats"), []);
+  const member = useRef(null);
+  const handleVerified = useCallback((verifiedMember) => {
+    member.current = verifiedMember;
+    setStage("seats");
+  }, []);
+  const handlePick = useCallback(() => onDone(member.current), [onDone]);
 
   const progress = Math.min(1, Math.max(0, 1 - step.ahead / QUEUE_SIZE));
 
@@ -124,7 +129,7 @@ export default function Queue({ onDone }) {
               </>
             )}
 
-            {stage === "seats" && <SeatMap onPick={onDone} />}
+            {stage === "seats" && <SeatMap onPick={handlePick} />}
           </section>
 
           {(stage === "waiting" || stage === "line") && (

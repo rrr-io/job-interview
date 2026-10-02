@@ -10,6 +10,7 @@ import RedirectError from "./components/RedirectError";
 import TakeSeat from "./components/TakeSeat";
 import Terminal from "./components/Terminal";
 import { CONFIG } from "./config";
+import { DEFAULT_FACE, ERASER_FACES } from "./erasers";
 import { prefersReducedMotion, sleep } from "./utils";
 
 export default function App() {
@@ -23,6 +24,7 @@ export default function App() {
   const skipRef = useRef(false);
   const pubmatRef = useRef(null);
   const [painted, setPainted] = useState(false);
+  const [member, setMember] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -106,7 +108,8 @@ export default function App() {
     setPhase("queue");
   }, []);
 
-  const backFromQueue = useCallback(async () => {
+  const backFromQueue = useCallback(async (verifiedMember) => {
+    setMember(verifiedMember);
     setSeat("done");
     setPhase("applied");
     setGlitch(1);
@@ -162,7 +165,7 @@ export default function App() {
         )}
 
         {phase === "erase" && (
-          <Eraser label={CONFIG.newRole} pubmatRef={pubmatRef} onPainted={handlePainted} onDone={handleErased} />
+          <Eraser face={ERASER_FACES[member] ?? DEFAULT_FACE} label={CONFIG.newRole} pubmatRef={pubmatRef} onPainted={handlePainted} onDone={handleErased} />
         )}
 
         {(phase === "done" || phase === "applied" || (phase === "erase" && !painted)) && <TakeSeat status={seat} onRun={takeSeat} onClearTyped={handleClearTyped} />}
