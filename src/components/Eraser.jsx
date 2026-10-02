@@ -8,7 +8,7 @@ import "./Eraser.css";
 const W = 1080;
 const H = 1350;
 const BRUSH = 110;
-const DONE_AT = 0.8;
+const DONE_AT = 0.9;
 const STRIDE = 4;
 const CHAIR_HITS = 18;
 const MAX_CRUMBS = 30;
@@ -86,7 +86,7 @@ export default function Eraser({ face = DEFAULT_FACE, label, onPainted, onDone }
     }
 
     setup();
-    const lazyTimer = setTimeout(() => setLazy(true), 8000);
+    const lazyTimer = setTimeout(() => setLazy(true), 20000);
     return () => {
       cancelled = true;
       clearTimeout(lazyTimer);
