@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import pubmat from "./assets/pubmat.jpg";
+import chairOnly from "./assets/pubmat-chair-only.jpg";
 import ChairLabel from "./components/ChairLabel";
+import Eraser from "./components/Eraser";
 import ErrorCascade from "./components/ErrorCascade";
 import Glitch from "./components/Glitch";
 import Queue from "./components/Queue";
@@ -12,13 +14,15 @@ import { prefersReducedMotion, sleep } from "./utils";
 
 export default function App() {
   const [run, setRun] = useState(0);
-  const [phase, setPhase] = useState("idle"); // idle | breach | terminal | closing | done | redirect | queue | applied
+  const [phase, setPhase] = useState("idle"); // idle | breach | terminal | closing | done | redirect | queue | applied | erase | clean
   const [glitch, setGlitch] = useState(0);
   const [shake, setShake] = useState(false);
   const [label, setLabel] = useState("");
   const [seat, setSeat] = useState("ready"); // ready | running | crashing | done | clearing | failed
   const labelTimer = useRef(null);
   const skipRef = useRef(false);
+  const pubmatRef = useRef(null);
+  const [painted, setPainted] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -26,6 +30,7 @@ export default function App() {
     setPhase("idle");
     setLabel("");
     setSeat("ready");
+    setPainted(false);
 
     async function breach() {
       await sleep(CONFIG.idleBeforeHack);
@@ -116,9 +121,20 @@ export default function App() {
   }, [phase, seat]);
 
   const handleClearTyped = useCallback(async () => {
+    const fast = prefersReducedMotion();
     await sleep(350);
     setSeat("failed");
+    await sleep(fast ? 1200 : 1800);
+    setShake(true);
+    setGlitch(1);
+    await sleep(fast ? 0 : 350);
+    setGlitch(0);
+    setShake(false);
+    setPhase("erase");
   }, []);
+
+  const handlePainted = useCallback(() => setPainted(true), []);
+  const handleErased = useCallback(() => setPhase("clean"), []);
 
   const terminalOpen = phase === "terminal" || phase === "closing";
   const pubmatClass = ["pubmat", phase === "breach" && "breach", shake && "shake"].filter(Boolean).join(" ");
@@ -128,14 +144,14 @@ export default function App() {
 
   return (
     <main className="page">
-      <div className={pubmatClass}>
-        <img
-          className="layer"
-          src={pubmat}
-          alt="Recruitment pubmat: We're hiring."
-        />
+      <div className={pubmatClass} ref={pubmatRef}>
+        {painted ? (
+          <img className="layer" src={chairOnly} alt="An empty office chair." />
+        ) : (
+          <img className="layer" src={pubmat} alt="Recruitment pubmat: We're hiring." />
+        )}
 
-        <ChairLabel text={label} typing={label !== "" && label !== CONFIG.newRole} />
+        {!painted && <ChairLabel text={label} typing={label !== "" && label !== CONFIG.newRole} />}
 
         <Glitch src={pubmat} intensity={glitch} />
 
@@ -145,11 +161,15 @@ export default function App() {
           </div>
         )}
 
-        {(phase === "done" || phase === "applied") && <TakeSeat status={seat} onRun={takeSeat} onClearTyped={handleClearTyped} />}
+        {phase === "erase" && (
+          <Eraser label={CONFIG.newRole} pubmatRef={pubmatRef} onPainted={handlePainted} onDone={handleErased} />
+        )}
+
+        {(phase === "done" || phase === "applied" || (phase === "erase" && !painted)) && <TakeSeat status={seat} onRun={takeSeat} onClearTyped={handleClearTyped} />}
 
         {seat === "crashing" && <ErrorCascade />}
 
-        {(phase === "done" || phase === "applied") && (
+        {(phase === "done" || phase === "applied" || phase === "clean") && (
           <button className="replay" onClick={() => setRun((r) => r + 1)}>
             replay
           </button>

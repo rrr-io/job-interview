@@ -1,0 +1,86 @@
+.erase-canvas {
+  touch-action: none;
+  cursor: none;
+  transition: opacity 0.6s ease;
+}
+
+.erase-canvas.fading {
+  opacity: 0;
+}
+
+.eraser {
+  position: absolute;
+  width: 24%;
+  aspect-ratio: 2 / 1;
+  transform: translate(-12%, -50%) rotate(-18deg);
+  pointer-events: none;
+  filter: drop-shadow(0 1cqw 1.2cqw rgba(0, 0, 0, 0.25));
+}
+
+.eraser svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.eraser:not(.dragging) {
+  animation: eraser-bob 1.6s ease-in-out infinite;
+}
+
+@keyframes eraser-bob {
+  50% {
+    transform: translate(-12%, -62%) rotate(-14deg);
+  }
+}
+
+.eraser-hint {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  margin-top: 0.4em;
+  padding: 0.15em 0.6em;
+  background: #111;
+  color: #fff;
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(10px, 2.2cqw, 14px);
+  white-space: nowrap;
+  transform: rotate(18deg);
+}
+
+.erase-meter {
+  position: absolute;
+  left: 25%;
+  right: 25%;
+  bottom: 9%;
+  height: 0.9cqw;
+  min-height: 5px;
+  background: #eee;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.erase-meter span {
+  display: block;
+  height: 100%;
+  background: var(--red);
+  transition: width 0.2s;
+}
+
+.erase-lazy {
+  position: absolute;
+  left: 50%;
+  bottom: 3.6%;
+  transform: translateX(-50%);
+  background: none;
+  border: 0;
+  color: #111;
+  font-family: "JetBrains Mono", monospace;
+  font-size: clamp(10px, 2.2cqw, 14px);
+  text-decoration: underline;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.erase-lazy:hover {
+  opacity: 1;
+}
