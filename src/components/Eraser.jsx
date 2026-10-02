@@ -11,6 +11,8 @@ const BRUSH = 110;
 const DONE_AT = 0.8;
 const STRIDE = 4;
 const CHAIR_HITS = 18;
+const MAX_CRUMBS = 30;
+const MAX_WEAR = 0.18;
 
 const loadImage = (src) =>
   new Promise((resolve) => {
@@ -81,6 +83,8 @@ export default function Eraser({ face = DEFAULT_FACE, label, pubmatRef, onPainte
   const contentRef = useRef(null);
   const chairHits = useRef(0);
   const [protectedChair, setProtectedChair] = useState(false);
+  const [crumbs, setCrumbs] = useState([]);
+  const crumbId = useRef(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -197,6 +201,23 @@ export default function Eraser({ face = DEFAULT_FACE, label, pubmatRef, onPainte
     }
   };
 
+  // Crumbs pick up a bit of whatever they erased
+  const dropCrumb = (p, [r, g, b, a]) => {
+    const mix = (c) => Math.round(a > 0 ? (c + 235) / 2 : 230);
+    const id = ++crumbId.current;
+    const crumb = {
+      id,
+      x: p.px,
+      y: p.py,
+      size: 0.6 + Math.random() * 0.8,
+      dx: (Math.random() - 0.5) * 6,
+      spin: (Math.random() - 0.5) * 540,
+      color: `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`,
+    };
+    setCrumbs((list) => [...list.slice(-MAX_CRUMBS + 1), crumb]);
+    setTimeout(() => setCrumbs((list) => list.filter((c) => c.id !== id)), 900);
+  };
+
   const down = (e) => {
     if (finished.current) return;
     e.preventDefault();
@@ -213,8 +234,10 @@ export default function Eraser({ face = DEFAULT_FACE, label, pubmatRef, onPainte
     if (!drawing.current) return;
     const p = toCanvas(e);
     setCursor({ x: p.px, y: p.py });
+    const under = canvasRef.current.getContext("2d", { willReadFrequently: true }).getImageData(Math.round(p.x), Math.round(p.y), 1, 1).data;
     stroke(p);
     checkChair(p);
+    if (moves.current % 3 === 0) dropCrumb(p, under);
     if (++moves.current % 10 === 0) measure();
   };
 
@@ -241,11 +264,22 @@ export default function Eraser({ face = DEFAULT_FACE, label, pubmatRef, onPainte
       />
 
       {!fading && (
-        <div className={`eraser ${dragging ? "dragging" : ""} ${protectedChair ? "bonk" : ""}`} style={{ left: `${cursor.x}%`, top: `${cursor.y}%` }} aria-hidden="true">
+        <div className={`eraser ${dragging ? "dragging" : ""} ${protectedChair ? "bonk" : ""}`} style={{ left: `${cursor.x}%`, top: `${cursor.y}%`, "--wear": 1 - MAX_WEAR * Math.min(1, progress / DONE_AT) }}
+          aria-hidden="true"
+        >
           <img className="eraser-face" src={face} alt="" draggable="false" />
           {!dragging && progress === 0 && <span className="eraser-hint">drag me</span>}
         </div>
       )}
+
+      {crumbs.map((c) => (
+        <span
+          key={c.id}
+          className="crumb"
+          style={{ left: `${c.x}%`, top: `${c.y}%`, "--size": `${c.size}cqw`, "--dx": `${c.dx}cqw`, "--spin": `${c.spin}deg`, background: c.color }}
+          aria-hidden="true"
+        />
+      ))}
 
       {!fading && (
         <div className="erase-meter" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round((progress / DONE_AT) * 100)}>

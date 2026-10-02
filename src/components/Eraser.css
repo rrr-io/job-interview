@@ -11,7 +11,7 @@
 .eraser {
   position: absolute;
   width: 23%;
-  transform: translate(-50%, -62%) rotate(-12deg);
+  transform: translate(-50%, -62%) rotate(-12deg) scale(var(--wear, 1));
   pointer-events: none;
 }
 
@@ -37,7 +37,7 @@
 
 @keyframes eraser-bob {
   50% {
-    transform: translate(-50%, -72%) rotate(-8deg);
+    transform: translate(-50%, -72%) rotate(-8deg) scale(var(--wear, 1));
   }
 }
 
@@ -99,10 +99,10 @@
 
 @keyframes eraser-bonk {
   25% {
-    transform: translate(-68%, -62%) rotate(-28deg);
+    transform: translate(-68%, -62%) rotate(-28deg) scale(var(--wear, 1));
   }
   75% {
-    transform: translate(-32%, -62%) rotate(4deg);
+    transform: translate(-32%, -62%) rotate(4deg) scale(var(--wear, 1));
   }
 }
 
@@ -110,4 +110,24 @@
   left: 19%;
   top: 40%;
   pointer-events: none;
+}
+
+/* Eraser crumbs */
+.crumb {
+  position: absolute;
+  width: var(--size);
+  height: calc(var(--size) * 0.6);
+  border-radius: 40%;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.12),
+    inset -0.15cqw -0.1cqw 0 rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+  animation: crumb-fall 0.9s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+@keyframes crumb-fall {
+  to {
+    opacity: 0;
+    transform: translate(var(--dx), 6cqw) rotate(var(--spin));
+  }
 }
