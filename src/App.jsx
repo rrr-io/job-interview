@@ -146,14 +146,14 @@ export default function App() {
   const handleErased = useCallback(() => setPhase("clean"), []);
 
 
-  const pubmatClass = ["pubmat", phase === "breach" && "breach", shake && "shake"].filter(Boolean).join(" ");
+  const pageClass = ["page", phase === "breach" && "breach", shake && "shake"].filter(Boolean).join(" ");
 
   if (phase === "redirect") return <RedirectError host="apply.emgp" />;
   if (phase === "queue") return <Queue onDone={backFromQueue} />;
 
   return (
-    <main className="page">
-      <div className={pubmatClass}>
+    <main className={pageClass}>
+      <div className="pubmat">
         {painted ? (
           <img className="layer" src={chairOnly} alt="An empty office chair." />
         ) : (

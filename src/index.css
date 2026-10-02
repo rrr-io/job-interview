@@ -41,6 +41,7 @@ button {
   height: 100%;
   display: grid;
   place-items: center;
+  background: var(--paper);
 }
 
 /* Fills the viewport while keeping the 4:5 pubmat ratio */
