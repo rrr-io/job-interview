@@ -18,12 +18,16 @@ function Prompt({ host, cwd }) {
 
 // A bash session that plays a list of steps. The list can grow while it runs.
 // Steps: cmd (typed, optional `then` changes host/cwd, optional `clear`), out (printed),
-// pause (ms), progress (bar up to 10), effect (callback to the parent).
+// pause (ms), progress (bar up to 10), ask (waits for the button, then types the answer),
+// effect (callback to the parent).
 export default function Terminal({ steps, start = START, onEffect, onIdle, skipRef }) {
   const [lines, setLines] = useState([]);
   const [typing, setTyping] = useState(null);
   const [progress, setProgress] = useState(null);
   const [ctx, setCtx] = useState(start);
+  const [asking, setAsking] = useState(null);
+  const [skippable, setSkippable] = useState(Boolean(skipRef));
+  const answer = useRef(null);
   const bodyRef = useRef(null);
 
   const ctxRef = useRef(start);
@@ -79,6 +83,14 @@ export default function Terminal({ steps, start = START, onEffect, onIdle, skipR
         }
         setProgress(null);
         print({ kind: "out", text: `[${"#".repeat(step.progress)}${".".repeat(10 - step.progress)}] ${step.progress * 10}%` });
+      } else if (step.ask) {
+        if (skipRef) skipRef.current = false;
+        setSkippable(false);
+        setAsking(step);
+        await new Promise((resolve) => (answer.current = resolve));
+        setAsking(null);
+        print({ kind: "out", text: step.ask + step.answer });
+        await sleep(250);
       } else if (step.out !== undefined) {
         print({ kind: "out", text: step.out, tone: step.tone });
         await wait(step.tone === "err" ? 750 : 120);
@@ -107,12 +119,12 @@ export default function Terminal({ steps, start = START, onEffect, onIdle, skipR
   useEffect(() => {
     const body = bodyRef.current;
     if (body) body.scrollTop = body.scrollHeight;
-  }, [lines, typing, progress]);
+  }, [lines, typing, progress, asking]);
 
   return (
     <div className="term" role="log" aria-live="polite" aria-label="Terminal">
       <div className="term-bar">
-        {skipRef && (
+        {skippable && (
           <button className="term-skip" onClick={() => (skipRef.current = true)}>
             skip
           </button>
@@ -138,6 +150,17 @@ export default function Terminal({ steps, start = START, onEffect, onIdle, skipR
             [{"#".repeat(progress)}
             {".".repeat(10 - progress)}] {progress * 10}%
           </div>
+        )}
+        {asking && (
+          <>
+            <div className="tl out">
+              {asking.ask}
+              <span className="caret" />
+            </div>
+            <button className="term-answer" onClick={() => answer.current?.()}>
+              [ {asking.button} ]
+            </button>
+          </>
         )}
         {typing !== null && (
           <div className="tl cmd">

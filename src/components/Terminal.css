@@ -151,6 +151,36 @@
   color: var(--term-ok);
 }
 
+.tl:empty {
+  min-height: 1.55em;
+}
+
+.term-answer {
+  display: block;
+  width: 100%;
+  margin: 0.6em 0 0.2em;
+  padding: 0.55em;
+  background: transparent;
+  color: var(--term-ok);
+  border: 1.5px solid var(--term-ok);
+  border-radius: 0.4em;
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  animation: term-answer-in 0.3s steps(3) 1;
+}
+
+.term-answer:hover {
+  background: rgba(138, 226, 52, 0.12);
+}
+
+@keyframes term-answer-in {
+  from {
+    opacity: 0;
+  }
+}
+
 .tl.err {
   color: var(--term-err);
   font-weight: 700;

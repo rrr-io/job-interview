@@ -2,6 +2,8 @@ import { CONFIG } from "./config";
 
 const { user, host, newRole } = CONFIG;
 
+const position = newRole.replace(/ /g, "_");
+
 // The hacking session, from the laptop into the recruitment server
 export const HACK_STEPS = [
   { cmd: `ssh ${user}@${host}`, then: { host } },
@@ -31,7 +33,23 @@ export const HACK_STEPS = [
   { cmd: 'git commit -am "fix: hiring post was missing a position"' },
   { out: "[main 3f7c2a1] fix: hiring post was missing a position" },
   { out: " 1 file changed, 1 insertion(+)", tone: "dim" },
-  { cmd: "exit", then: { host: "laptop", cwd: "~" } },
-  { out: `Connection to ${host} closed.`, tone: "dim" },
-  { pause: 900, effect: "exit" },
+  { cmd: "clear", clear: true },
+  { cmd: "./recruitment_patch.sh --status" },
+  { out: "Position successfully added.", tone: "ok" },
+  { out: "" },
+  { out: "POSITION        STATUS", tone: "head" },
+  { out: `${position}   AVAILABLE` },
+  { out: "" },
+  { out: "1 seat remaining." },
+  { ask: "Reserve this seat? [y/N] ", answer: "y", button: "TAKE A SEAT", effect: "take-seat" },
+];
+
+export const SUBMIT_STEPS = [
+  { out: "Reserving seat #001... done", tone: "ok" },
+  { out: "Submitting application to apply.emgp..." },
+  { progress: 6 },
+  { pause: 500 },
+  { out: "error: unexpected response from apply.emgp", tone: "err" },
+  { out: "Retrying...", tone: "dim" },
+  { pause: 900, effect: "crash" },
 ];

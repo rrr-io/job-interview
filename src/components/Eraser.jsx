@@ -21,53 +21,15 @@ const loadImage = (src) =>
     img.src = src;
   });
 
-// Copies the DOM leftovers (role label, command box) onto the canvas so they can be erased too
-function paintLeftovers(ctx, pubmatEl, label) {
+// The role label lives in an SVG overlay, so it is redrawn on the canvas to be erasable too
+function paintLabel(ctx, label) {
   ctx.fillStyle = "#fff";
   ctx.font = '27px "Libre Baskerville", Georgia, serif';
   ctx.textAlign = "center";
   ctx.fillText(label, 540, 826);
-
-  const box = pubmatEl?.querySelector(".take-seat");
-  if (!box) return;
-  const frame = pubmatEl.getBoundingClientRect();
-  const scale = W / frame.width;
-  const toCanvas = (r) => ({
-    x: (r.left - frame.left) * scale,
-    y: (r.top - frame.top) * scale,
-    w: r.width * scale,
-    h: r.height * scale,
-  });
-
-  const b = toCanvas(box.getBoundingClientRect());
-  ctx.fillStyle = "#0d0d0f";
-  ctx.beginPath();
-  ctx.roundRect(b.x, b.y, b.w, b.h, 13);
-  ctx.fill();
-
-  const fontSize = parseFloat(getComputedStyle(box).fontSize) * scale;
-  ctx.font = `${fontSize}px "JetBrains Mono", monospace`;
-  ctx.textAlign = "left";
-  ctx.textBaseline = "middle";
-
-  box.querySelectorAll(".take-seat-cmd, .take-seat-out").forEach((line) => {
-    const r = toCanvas(line.getBoundingClientRect());
-    const pad = parseFloat(getComputedStyle(line).paddingLeft) * scale;
-    let x = r.x + pad;
-    const y = r.y + (r.h - parseFloat(getComputedStyle(line).paddingBottom) * scale + parseFloat(getComputedStyle(line).paddingTop) * scale) / 2;
-    const ps1 = line.querySelector(".ps1");
-    if (ps1) {
-      ctx.fillStyle = "#ff0000";
-      ctx.fillText("$", x, y);
-      x += ctx.measureText("$ ").width;
-    }
-    const text = line.textContent.replace(/^\$\s*/, "");
-    ctx.fillStyle = line.classList.contains("err") ? "#ff3b3b" : line.classList.contains("ok") ? "#9be7a5" : "#ededed";
-    ctx.fillText(text, x, y);
-  });
 }
 
-export default function Eraser({ face = DEFAULT_FACE, label, pubmatRef, onPainted, onDone }) {
+export default function Eraser({ face = DEFAULT_FACE, label, onPainted, onDone }) {
   const canvasRef = useRef(null);
   const maskRef = useRef([]);
   const baseRef = useRef(null);
@@ -95,7 +57,7 @@ export default function Eraser({ face = DEFAULT_FACE, label, pubmatRef, onPainte
 
       const ctx = canvasRef.current.getContext("2d", { willReadFrequently: true });
       ctx.drawImage(original, 0, 0, W, H);
-      paintLeftovers(ctx, pubmatRef.current, label);
+      paintLabel(ctx, label);
 
       const off = document.createElement("canvas");
       off.width = W;
@@ -129,7 +91,7 @@ export default function Eraser({ face = DEFAULT_FACE, label, pubmatRef, onPainte
       cancelled = true;
       clearTimeout(lazyTimer);
     };
-  }, [label, pubmatRef, onPainted]);
+  }, [label, onPainted]);
 
   const finish = useCallback(() => {
     if (finished.current) return;
