@@ -43,12 +43,15 @@
   }
 }
 
+/* Plain Linux terminal: GNOME-style title bar, bash colours */
 .term {
-  --term-bg: #0d0d0f;
-  --term-ink: #ededed;
-  --term-dim: #8a8a90;
-  --term-ok: #9be7a5;
-  --term-err: #ff3b3b;
+  --term-bg: #0f0f10;
+  --term-ink: #d8d8d8;
+  --term-dim: #8a8a8a;
+  --term-ok: #8ae234;
+  --term-err: #ff5f56;
+  --term-user: #8ae234;
+  --term-cwd: #729fcf;
 
   height: 100%;
   display: flex;
@@ -56,43 +59,72 @@
   overflow: hidden;
   background: var(--term-bg);
   color: var(--term-ink);
-  border-radius: 1.2cqw;
+  border: 1px solid #333;
+  border-radius: 1.4cqw;
   box-shadow: 0 2cqw 5cqw rgba(0, 0, 0, 0.35);
-  font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  font-family: "JetBrains Mono", "Ubuntu Mono", ui-monospace, Menlo, Consolas, monospace;
   font-size: clamp(9.5px, 2.45cqw, 15px);
   line-height: 1.55;
 }
 
 .term-bar {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 1em;
-  padding: 0.5em 0.9em;
-  background: #1c1c20;
-  border-bottom: 1px solid #2a2a30;
+  min-height: 2.4em;
+  padding: 0.35em 0.6em;
+  background: #2b2b2b;
+  border-bottom: 1px solid #1c1c1c;
+  color: #c8c8c8;
+  font-family: -apple-system, "Ubuntu", "Segoe UI", Roboto, sans-serif;
 }
 
 .term-title {
-  flex: 1;
-  color: var(--term-dim);
+  position: absolute;
+  left: 4.5em;
+  right: 4.5em;
+  text-align: center;
+  font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  pointer-events: none;
 }
 
+.term-buttons {
+  display: flex;
+  gap: 0.45em;
+  margin-left: auto;
+}
+
+.term-buttons span {
+  display: grid;
+  place-items: center;
+  width: 1.45em;
+  height: 1.45em;
+  background: #3d3d3d;
+  border-radius: 50%;
+  font-size: 0.8em;
+  line-height: 1;
+}
+
+
 .term-skip {
+  position: relative;
+  z-index: 1;
   padding: 0 0.7em;
   line-height: 1.7;
-  background: none;
-  border: 1px solid #3a3a42;
-  border-radius: 0.3em;
-  color: var(--term-dim);
+  background: #3d3d3d;
+  border: 0;
+  border-radius: 0.4em;
+  color: #e0e0e0;
+  font: inherit;
+  font-size: 0.85em;
   cursor: pointer;
 }
 
 .term-skip:hover {
-  border-color: var(--term-dim);
-  color: var(--term-ink);
+  background: #505050;
 }
 
 .term-body {
@@ -120,15 +152,23 @@
 }
 
 .tl.err {
-  display: inline-block;
-  margin: 0.15em 0;
-  padding: 0 0.35em;
-  background: var(--term-err);
-  color: #fff;
+  color: var(--term-err);
+  font-weight: 700;
 }
 
-.ps1 {
-  color: var(--red);
+.tl.head {
+  color: #fff;
+  font-weight: 700;
+}
+
+.ps1-user {
+  color: var(--term-user);
+  font-weight: 700;
+}
+
+.ps1-cwd {
+  color: var(--term-cwd);
+  font-weight: 700;
 }
 
 .caret {

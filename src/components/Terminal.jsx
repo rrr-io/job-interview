@@ -1,63 +1,108 @@
-import { useEffect, useRef, useState } from "react";
-import { PROMPT, SCRIPT, TITLE } from "../terminalScript";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { CONFIG } from "../config";
 import { prefersReducedMotion, sleep } from "../utils";
 import "./Terminal.css";
 
-export default function Terminal({ onEffect, onExit, skipRef }) {
+const START = { host: "laptop", cwd: "~" };
+
+function Prompt({ host, cwd }) {
+  return (
+    <span className="ps1">
+      <span className="ps1-user">
+        {CONFIG.user}@{host}
+      </span>
+      :<span className="ps1-cwd">{cwd}</span>${" "}
+    </span>
+  );
+}
+
+// A bash session that plays a list of steps. The list can grow while it runs.
+// Steps: cmd (typed, optional `then` changes host/cwd, optional `clear`), out (printed),
+// pause (ms), progress (bar up to 10), effect (callback to the parent).
+export default function Terminal({ steps, start = START, onEffect, onIdle, skipRef }) {
   const [lines, setLines] = useState([]);
   const [typing, setTyping] = useState(null);
   const [progress, setProgress] = useState(null);
+  const [ctx, setCtx] = useState(start);
   const bodyRef = useRef(null);
 
+  const ctxRef = useRef(start);
+  const stepsRef = useRef(steps);
+  const processed = useRef(0);
+  const running = useRef(false);
+  const alive = useRef(true);
+  const handlers = useRef({ onEffect, onIdle });
+  stepsRef.current = steps;
+  handlers.current = { onEffect, onIdle };
+
   useEffect(() => {
-    let cancelled = false;
-    const instant = () => skipRef.current || prefersReducedMotion();
-    const wait = (ms) => sleep(instant() ? 0 : ms);
-    const print = (line) => setLines((prev) => [...prev, line]);
-
-    async function run() {
-      await wait(450);
-      for (const step of SCRIPT) {
-        if (cancelled) return;
-
-        if (step.cmd) {
-          setTyping("");
-          await wait(280);
-          for (let i = 1; i <= step.cmd.length && !instant(); i++) {
-            if (cancelled) return;
-            setTyping(step.cmd.slice(0, i));
-            await sleep(24 + Math.random() * 40);
-          }
-          setTyping(null);
-          print({ kind: "cmd", text: step.cmd });
-          await wait(180);
-        } else if (step.pause) {
-          setTyping("");
-          await wait(step.pause);
-        } else if (step.progress) {
-          for (let p = 0; p <= 10; p++) {
-            if (cancelled) return;
-            setProgress(p);
-            await wait(140);
-          }
-          setProgress(null);
-          print({ kind: "out", text: "[##########] 100%" });
-        } else {
-          print({ kind: "out", text: step.out, tone: step.tone });
-          if (step.effect) onEffect(step.effect);
-          await wait(step.tone === "err" ? 750 : 120);
-        }
-      }
-      setTyping(null);
-      await wait(900);
-      if (!cancelled) onExit();
-    }
-
-    run();
+    alive.current = true;
     return () => {
-      cancelled = true;
+      alive.current = false;
     };
-  }, [onEffect, onExit, skipRef]);
+  }, []);
+
+  const runStep = useCallback(
+    async (step) => {
+      const instant = () => skipRef?.current || prefersReducedMotion();
+      const wait = (ms) => sleep(instant() ? 0 : ms);
+      const print = (line) => setLines((prev) => [...prev, line]);
+
+      if (step.cmd) {
+        setTyping("");
+        await wait(280);
+        for (let i = 1; i <= step.cmd.length && !instant(); i++) {
+          if (!alive.current) return;
+          setTyping(step.cmd.slice(0, i));
+          await sleep(24 + Math.random() * 40);
+        }
+        setTyping(null);
+        if (step.clear) {
+          setLines([]);
+        } else {
+          print({ kind: "cmd", text: step.cmd, ctx: ctxRef.current });
+        }
+        if (step.then) {
+          ctxRef.current = { ...ctxRef.current, ...step.then };
+          setCtx(ctxRef.current);
+        }
+        await wait(180);
+      } else if (step.pause) {
+        setTyping("");
+        await wait(step.pause);
+        setTyping(null);
+      } else if (step.progress) {
+        for (let p = 0; p <= step.progress; p++) {
+          if (!alive.current) return;
+          setProgress(p);
+          await wait(140);
+        }
+        setProgress(null);
+        print({ kind: "out", text: `[${"#".repeat(step.progress)}${".".repeat(10 - step.progress)}] ${step.progress * 10}%` });
+      } else if (step.out !== undefined) {
+        print({ kind: "out", text: step.out, tone: step.tone });
+        await wait(step.tone === "err" ? 750 : 120);
+      }
+
+      if (step.effect) handlers.current.onEffect?.(step.effect);
+    },
+    [skipRef]
+  );
+
+  const pump = useCallback(async () => {
+    if (running.current) return;
+    running.current = true;
+    while (alive.current && processed.current < stepsRef.current.length) {
+      await runStep(stepsRef.current[processed.current]);
+      processed.current += 1;
+    }
+    running.current = false;
+    if (alive.current) handlers.current.onIdle?.();
+  }, [runStep]);
+
+  useEffect(() => {
+    pump();
+  }, [steps, pump]);
 
   useEffect(() => {
     const body = bodyRef.current;
@@ -67,15 +112,24 @@ export default function Terminal({ onEffect, onExit, skipRef }) {
   return (
     <div className="term" role="log" aria-live="polite" aria-label="Terminal">
       <div className="term-bar">
-        <span className="term-title">{TITLE}</span>
-        <button className="term-skip" onClick={() => (skipRef.current = true)}>
-          skip
-        </button>
+        {skipRef && (
+          <button className="term-skip" onClick={() => (skipRef.current = true)}>
+            skip
+          </button>
+        )}
+        <span className="term-title">
+          {CONFIG.user}@{ctx.host}: {ctx.cwd}
+        </span>
+        <span className="term-buttons" aria-hidden="true">
+          <span>–</span>
+          <span>□</span>
+          <span>×</span>
+        </span>
       </div>
       <div className="term-body" ref={bodyRef}>
         {lines.map((line, i) => (
           <div key={i} className={`tl ${line.kind} ${line.tone ?? ""}`}>
-            {line.kind === "cmd" && <span className="ps1">{PROMPT}</span>}
+            {line.kind === "cmd" && <Prompt {...line.ctx} />}
             {line.text}
           </div>
         ))}
@@ -87,7 +141,7 @@ export default function Terminal({ onEffect, onExit, skipRef }) {
         )}
         {typing !== null && (
           <div className="tl cmd">
-            <span className="ps1">{PROMPT}</span>
+            <Prompt {...ctx} />
             {typing}
             <span className="caret" />
           </div>

@@ -11,6 +11,7 @@ import TakeSeat from "./components/TakeSeat";
 import Terminal from "./components/Terminal";
 import { CONFIG } from "./config";
 import { DEFAULT_FACE, ERASER_FACES } from "./erasers";
+import { HACK_STEPS } from "./terminalScript";
 import { prefersReducedMotion, sleep } from "./utils";
 
 export default function App() {
@@ -69,19 +70,6 @@ export default function App() {
     }, 95);
   }, []);
 
-  const handleEffect = useCallback(
-    (effect) => {
-      if (effect === "shake") {
-        setShake(true);
-        setGlitch(0.8);
-        setTimeout(() => setGlitch(0), 260);
-        setTimeout(() => setShake(false), 420);
-      }
-      if (effect === "label") typeLabel();
-    },
-    [typeLabel]
-  );
-
   const handleExit = useCallback(async () => {
     clearInterval(labelTimer.current);
     setLabel(CONFIG.newRole);
@@ -91,6 +79,20 @@ export default function App() {
     setGlitch(0);
     setPhase("done");
   }, []);
+
+  const handleEffect = useCallback(
+    (effect) => {
+      if (effect === "shake") {
+        setShake(true);
+        setGlitch(0.8);
+        setTimeout(() => setGlitch(0), 260);
+        setTimeout(() => setShake(false), 420);
+      }
+      if (effect === "label") typeLabel();
+      if (effect === "exit") handleExit();
+    },
+    [typeLabel, handleExit]
+  );
 
   const takeSeat = useCallback(async () => {
     const fast = prefersReducedMotion();
@@ -160,7 +162,7 @@ export default function App() {
 
         {terminalOpen && (
           <div className={`term-wrap ${phase === "closing" ? "closing" : ""}`}>
-            <Terminal key={run} onEffect={handleEffect} onExit={handleExit} skipRef={skipRef} />
+            <Terminal key={run} steps={HACK_STEPS} onEffect={handleEffect} skipRef={skipRef} />
           </div>
         )}
 

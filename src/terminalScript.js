@@ -2,16 +2,13 @@ import { CONFIG } from "./config";
 
 const { user, host, newRole } = CONFIG;
 
-export const PROMPT = `${user}@emgp:~$ `;
-export const TITLE = `${user}@${host}: ~/hiring_post`;
-
-// Steps: cmd (typed), out (printed), pause (ms), progress (progress bar).
-// An out step can trigger an effect on the pubmat.
-export const SCRIPT = [
-  { cmd: `ssh ${user}@${host}` },
+// The hacking session, from the laptop into the recruitment server
+export const HACK_STEPS = [
+  { cmd: `ssh ${user}@${host}`, then: { host } },
   { out: `Warning: Permanently added '${host}' to the list of known hosts.` },
   { out: `Last login: ${new Date().toDateString()} from 127.0.0.1`, tone: "dim" },
-  { cmd: "cd hiring_post && ls -l open_positions/" },
+  { cmd: "cd hiring_post", then: { cwd: "~/hiring_post" } },
+  { cmd: "ls -l open_positions/" },
   { out: "total 3", tone: "dim" },
   { out: "drwxr-xr-x  2 emgp  staff  64  EDITOR" },
   { out: "drwxr-xr-x  2 emgp  staff  64  GRAPHIC_DESIGNER" },
@@ -29,11 +26,12 @@ export const SCRIPT = [
   { cmd: `./patch.sh hiring_post.png --add-label "${newRole}"` },
   { out: "scanning chair... 3 labels detected" },
   { out: "writing label 4/4", effect: "label" },
-  { progress: true },
+  { progress: 10 },
   { out: "hiring_post.png patched", tone: "ok" },
   { cmd: 'git commit -am "fix: hiring post was missing a position"' },
   { out: "[main 3f7c2a1] fix: hiring post was missing a position" },
   { out: " 1 file changed, 1 insertion(+)", tone: "dim" },
-  { cmd: "exit" },
+  { cmd: "exit", then: { host: "laptop", cwd: "~" } },
   { out: `Connection to ${host} closed.`, tone: "dim" },
+  { pause: 900, effect: "exit" },
 ];
