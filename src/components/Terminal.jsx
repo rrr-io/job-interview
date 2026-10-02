@@ -54,11 +54,11 @@ export default function Terminal({ steps, start = START, onEffect, onIdle, skipR
 
       if (step.cmd) {
         setTyping("");
-        await wait(280);
+        await wait(420);
         for (let i = 1; i <= step.cmd.length && !instant(); i++) {
           if (!alive.current) return;
           setTyping(step.cmd.slice(0, i));
-          await sleep(24 + Math.random() * 40);
+          await sleep(40 + Math.random() * 55);
         }
         setTyping(null);
         if (step.clear) {
@@ -70,7 +70,7 @@ export default function Terminal({ steps, start = START, onEffect, onIdle, skipR
           ctxRef.current = { ...ctxRef.current, ...step.then };
           setCtx(ctxRef.current);
         }
-        await wait(180);
+        await wait(320);
       } else if (step.pause) {
         setTyping("");
         await wait(step.pause);
@@ -79,7 +79,7 @@ export default function Terminal({ steps, start = START, onEffect, onIdle, skipR
         for (let p = 0; p <= step.progress; p++) {
           if (!alive.current) return;
           setProgress(p);
-          await wait(140);
+          await wait(190);
         }
         setProgress(null);
         print({ kind: "out", text: `[${"#".repeat(step.progress)}${".".repeat(10 - step.progress)}] ${step.progress * 10}%` });
@@ -93,7 +93,7 @@ export default function Terminal({ steps, start = START, onEffect, onIdle, skipR
         await sleep(250);
       } else if (step.out !== undefined) {
         print({ kind: "out", text: step.out, tone: step.tone });
-        await wait(step.tone === "err" ? 750 : 120);
+        await wait(step.tone === "err" ? 1100 : 280);
       }
 
       if (step.effect) handlers.current.onEffect?.(step.effect);
