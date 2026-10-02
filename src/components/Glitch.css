@@ -24,7 +24,6 @@
 
 .screen-bar {
   position: absolute;
-  mix-blend-mode: difference;
 }
 
 .scanlines {

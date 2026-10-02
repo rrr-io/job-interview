@@ -15,7 +15,7 @@ const randomSlices = (intensity) =>
     };
   });
 
-const BAR_COLORS = ["#ff0000", "#00dcff", "#111111", "#ffffff", "#ff3df0"];
+const BAR_COLORS = ["#000000", "#1a1a1a", "#777777", "#ffffff"];
 
 // Full-width bars of noise, so the glitch spills out of the pubmat onto the whole screen
 const randomBars = (intensity) =>
