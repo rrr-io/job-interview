@@ -53,3 +53,18 @@ export const SUBMIT_STEPS = [
   { out: "Retrying...", tone: "dim" },
   { pause: 900, effect: "crash" },
 ];
+
+// Back from the queue: a new session on the server
+export const RESUME_START = { host, cwd: "~/hiring_post" };
+
+const row = (...cells) => cells.map((cell, i) => (i < cells.length - 1 ? cell.padEnd([6, 15, 13][i]) : cell)).join("");
+
+export const RESUME_STEPS = [
+  { cmd: "./take-a-seat.sh --resume" },
+  { out: "Restoring previous session..." },
+  { out: "Checking reservation status..." },
+  { out: "Reservation found.", tone: "ok" },
+  { out: "" },
+  { out: row("SEAT", "POSITION", "RESERVED BY", "STATUS"), tone: "head" },
+  { out: row("#001", position, user.toUpperCase(), "CONFIRMED") },
+];

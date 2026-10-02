@@ -10,7 +10,7 @@ import RedirectError from "./components/RedirectError";
 import Terminal from "./components/Terminal";
 import { CONFIG } from "./config";
 import { DEFAULT_FACE, ERASER_FACES } from "./erasers";
-import { HACK_STEPS, SUBMIT_STEPS } from "./terminalScript";
+import { HACK_STEPS, RESUME_START, RESUME_STEPS, SUBMIT_STEPS } from "./terminalScript";
 import { prefersReducedMotion, sleep } from "./utils";
 
 export default function App() {
@@ -99,12 +99,14 @@ export default function App() {
     [typeLabel, crash]
   );
 
-  const backFromQueue = useCallback(async (verifiedMember) => {
-    const fast = prefersReducedMotion();
+  const backFromQueue = useCallback((verifiedMember) => {
     setMember(verifiedMember);
     setSeat("done");
     setPhase("applied");
-    await sleep(fast ? 300 : 1200);
+  }, []);
+
+  const toEraser = useCallback(async () => {
+    const fast = prefersReducedMotion();
     setShake(true);
     setGlitch(1);
     await sleep(fast ? 0 : 350);
@@ -112,6 +114,12 @@ export default function App() {
     setShake(false);
     setPhase("erase");
   }, []);
+
+  const idleTimer = useRef(null);
+  useEffect(() => () => clearTimeout(idleTimer.current), []);
+  const handleResumeIdle = useCallback(() => {
+    idleTimer.current = setTimeout(toEraser, 1600);
+  }, [toEraser]);
 
   const handlePainted = useCallback(() => setPainted(true), []);
   const handleErased = useCallback(() => setPhase("clean"), []);
@@ -138,6 +146,12 @@ export default function App() {
         {phase === "terminal" && (
           <div className="term-wrap">
             <Terminal key={run} steps={termSteps} onEffect={handleEffect} skipRef={skipRef} />
+          </div>
+        )}
+
+        {phase === "applied" && (
+          <div className="term-wrap">
+            <Terminal key={`resume-${run}`} steps={RESUME_STEPS} start={RESUME_START} onIdle={handleResumeIdle} />
           </div>
         )}
 
