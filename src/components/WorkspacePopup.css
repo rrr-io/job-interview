@@ -1,23 +1,24 @@
 .workspace-backdrop {
-  position: absolute;
+  position: fixed;
   inset: 0;
+  z-index: 45;
   display: grid;
   place-items: center;
-  padding: 6%;
+  padding: 20px;
   background: rgba(0, 0, 0, 0.45);
   animation: workspace-fade 0.2s ease-out;
 }
 
 .workspace-popup {
-  width: 100%;
-  padding: 3cqw 3.4cqw 2cqw;
+  width: min(420px, 100%);
+  padding: 16px 18px 12px;
   background: #111;
   color: #fff;
   border: 1.5px solid #e0a84a;
-  border-radius: 2cqw;
-  box-shadow: 0 3cqw 8cqw rgba(0, 0, 0, 0.5);
+  border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-  font-size: clamp(11px, 2.9cqw, 17px);
+  font-size: 15px;
   line-height: 1.35;
   animation: workspace-pop 0.35s cubic-bezier(0.3, 1.5, 0.5, 1);
 }

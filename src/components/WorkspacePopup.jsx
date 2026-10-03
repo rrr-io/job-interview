@@ -1,7 +1,9 @@
+import { createPortal } from "react-dom";
 import "./WorkspacePopup.css";
 
 export default function WorkspacePopup({ onCustomize }) {
-  return (
+  // Rendered on the body so the dimmed overlay covers the whole screen
+  return createPortal(
     <div className="workspace-backdrop">
       <div className="workspace-popup" role="alertdialog" aria-modal="true" aria-labelledby="workspace-title">
         <p className="workspace-title" id="workspace-title">
@@ -17,6 +19,7 @@ export default function WorkspacePopup({ onCustomize }) {
         </button>
         <p className="workspace-note"></p>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
