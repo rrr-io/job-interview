@@ -126,7 +126,7 @@ export default function Chaos({ onShake, onEngaged, onInteract }) {
           </div>
           <div className="win-body paint-body">
             <button className="win-button paint-tool" onClick={swapMember}>
-              {member ? "ANOTHER MEMBER" : "ENHYPEN"}
+              {member ? "SWITCH MEMBER" : "ADD ENHYPEN"}
             </button>
             {SHOW_DECORATIONS && (
               <button className="win-button paint-tool" onClick={addDecorations}>

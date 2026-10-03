@@ -82,7 +82,7 @@ export default function Feedback({ open = true, rated, onRated, onReplay, onClos
 
         <div className={`feedback-more ${rated ? "open" : ""}`}>
           <div>
-            <p className="feedback-since">Oh, let me leave you my contacts.</p>
+            <p className="feedback-since">Since you clearly loved it, let me leave you my contacts.</p>
             <div className="feedback-links">
               {CONFIG.links.map((link) => {
                 const Icon = ICONS[link.icon];
