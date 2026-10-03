@@ -3,6 +3,7 @@ import pubmat from "./assets/pubmat.jpg";
 import chairOnly from "./assets/pubmat-chair-only.jpg";
 import ChairLabel from "./components/ChairLabel";
 import Eraser from "./components/Eraser";
+import Chaos from "./components/Chaos";
 import ErrorCascade from "./components/ErrorCascade";
 import Glitch from "./components/Glitch";
 import Queue from "./components/Queue";
@@ -150,6 +151,10 @@ export default function App() {
   }, []);
 
   const handlePainted = useCallback(() => setPainted(true), []);
+  const shakeOnce = useCallback(() => {
+    setShake(true);
+    setTimeout(() => setShake(false), 420);
+  }, []);
   const handleErased = useCallback(() => setPhase("clean"), []);
 
 
@@ -191,11 +196,7 @@ export default function App() {
 
         {phase === "applied" && flagged && <WorkspacePopup onCustomize={customize} />}
 
-        {phase === "clean" && (
-          <button className="replay" onClick={() => setRun((r) => r + 1)}>
-            replay
-          </button>
-        )}
+        {phase === "clean" && <Chaos onShake={shakeOnce} />}
       </div>
     </main>
   );
