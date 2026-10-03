@@ -2,8 +2,10 @@
 const memberFiles = import.meta.glob("./assets/chaos/members/*.PNG", { eager: true, import: "default" });
 
 // ENHYPEN: one member at a time, sitting on the chair. Each click swaps them.
-// `size` is the width in pubmat pixels (the pubmat is 1080 wide).
-export const MEMBERS = Object.values(memberFiles).map((src) => ({ src, size: 430 }));
+// The PNGs are scaled so every face is about 128px wide (scripts/normalize_cutouts.py);
+// on the pubmat they are shown at natural width / CUTOUT_DENSITY, so faces end up ~85px.
+export const MEMBERS = Object.values(memberFiles).map((src) => ({ src }));
+export const CUTOUT_DENSITY = 1.5;
 
 // Decorations pile up around the chair, as many as you like (up to the cap)
 export const DECORATIONS = [

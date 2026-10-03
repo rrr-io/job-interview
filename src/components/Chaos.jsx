@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { CLICKS_BEFORE_RATING, DECORATIONS, LANDING, MAX_DECORATIONS, MEMBERS, SEAT } from "../chaos";
+import { CLICKS_BEFORE_RATING, CUTOUT_DENSITY, DECORATIONS, LANDING, MAX_DECORATIONS, MEMBERS, SEAT } from "../chaos";
 import "./Chaos.css";
 import "./Window.css";
 
@@ -8,6 +8,23 @@ const ENTRANCES = ["spin", "drop", "zoom", "fly-left", "fly-right"];
 const between = ([min, max]) => min + Math.random() * (max - min);
 const pick = (list) => list[Math.floor(Math.random() * list.length)];
 const pct = (value, total) => `${(value / total) * 100}%`;
+
+// Member cutouts get their size from the image itself, so faces match across photos
+const widths = new Map();
+const naturalWidth = (src) => {
+  if (!widths.has(src)) {
+    widths.set(
+      src,
+      new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(img.naturalWidth);
+        img.onerror = () => resolve(600);
+        img.src = src;
+      })
+    );
+  }
+  return widths.get(src);
+};
 
 function Thing({ item, className = "" }) {
   return (
@@ -48,15 +65,16 @@ export default function Chaos({ onShake, onEngaged, onInteract }) {
     if (clicks.current === CLICKS_BEFORE_RATING) setTimeout(() => onEngaged?.(), 900);
   };
 
-  const swapMember = () => {
+  const swapMember = async () => {
     const others = MEMBERS.filter((m) => m.src !== member?.src);
     const next = pick(others);
+    engage();
+    const size = (await naturalWidth(next.src)) / CUTOUT_DENSITY;
     if (member) {
       setLeaving(member);
       setTimeout(() => setLeaving(null), 450);
     }
-    setMember({ ...next, id: ++count.current, x: between(SEAT.x), y: between(SEAT.y), rotate: between([-6, 6]), entrance: "drop" });
-    engage();
+    setMember({ ...next, size, id: ++count.current, x: between(SEAT.x), y: between(SEAT.y), rotate: between([-6, 6]), entrance: "drop" });
   };
 
   const addDecorations = () => {
