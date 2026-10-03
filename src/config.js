@@ -7,6 +7,6 @@ export const CONFIG = {
   // Without the file, the button shows just the label.
   links: [
     { label: "GitHub", url: "https://github.com/rrr-io", icon: "github" },
-    { label: "X", url: "https://x.com/your_handle", icon: "x" },
+    { label: "X", url: "https://x.com/_rrriooo", icon: "x" },
   ],
 };

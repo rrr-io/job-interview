@@ -123,10 +123,9 @@
   text-transform: uppercase;
 }
 
-/* The official logos are black: invert them to sit on the dark window */
-.feedback-links img {
+/* react-icons use currentColor, so they follow the button text color */
+.feedback-links svg {
   width: 16px;
   height: 16px;
-  object-fit: contain;
-  filter: invert(1);
+  flex-shrink: 0;
 }

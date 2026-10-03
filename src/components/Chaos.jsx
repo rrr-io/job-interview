@@ -134,7 +134,7 @@ export default function Chaos({ onShake, onEngaged, onInteract }) {
               </button>
             )}
           </div>
-          <div className="win-status">more ENHYPEN, more ENGENE compliance</div>
+          <div className="win-status">more ENHYPEN, more ENHYPEN! Happier ENGENE!</div>
         </div>,
         document.body
       )}

@@ -2,14 +2,11 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { CONFIG } from "../config";
 import { prefersReducedMotion } from "../utils";
+import { ICONS } from "../icons.jsx";
 import "./Feedback.css";
 import "./Window.css";
 
 const STARS = 6;
-
-// Logos are optional files, so a missing one never breaks the build
-const ICONS = import.meta.glob("../assets/icons/*.svg", { eager: true, import: "default" });
-const iconFor = (name) => ICONS[`../assets/icons/${name}.svg`];
 
 // Whatever you pick, all six light up. Picking again changes nothing.
 export default function Feedback({ open = true, rated, onRated, onReplay, onClose }) {
@@ -87,12 +84,22 @@ export default function Feedback({ open = true, rated, onRated, onReplay, onClos
           <div>
             <p className="feedback-since">Oh, let me leave you my contacts.</p>
             <div className="feedback-links">
-              {CONFIG.links.map((link) => (
-                <a key={link.url} className="win-button" href={link.url} target="_blank" rel="noreferrer">
-                  {iconFor(link.icon) && <img src={iconFor(link.icon)} alt="" />}
-                  {link.label}
-                </a>
-              ))}
+              {CONFIG.links.map((link) => {
+                const Icon = ICONS[link.icon];
+                return (
+                  <a
+                    key={link.url}
+                    className="win-button"
+                    href={link.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={link.label}
+                    title={link.label}
+                  >
+                    {Icon ? <Icon aria-hidden="true" focusable="false" /> : link.label}
+                  </a>
+                );
+              })}
               <button className="win-button" onClick={onReplay}>
                 REPLAY
               </button>
