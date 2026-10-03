@@ -55,7 +55,7 @@ export default function Feedback({ open = true, rated, onRated, onReplay, onClos
             {enhanced ? (
               <>
                 <p className="finale-title">6/6. Excellent taste.</p>
-                <p className="finale-body">Your feedback might ot might not been slightly enhanced.</p>
+                <p className="finale-body">Your feedback might or might not have been slightly enhanced.</p>
               </>
             ) : (
               <>
@@ -104,6 +104,7 @@ export default function Feedback({ open = true, rated, onRated, onReplay, onClos
                 REPLAY
               </button>
             </div>
+            <p className="feedback-thanks">Thank you for always supporting ENHYPEN and inspiring ENGENE, whether I get the seat or not. 🤍</p>
           </div>
         </div>
       </div>

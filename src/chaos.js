@@ -31,8 +31,8 @@ export const DECORATIONS = [
 ];
 export const MAX_DECORATIONS = 24;
 
-// Clicks, on either button, before the rating shows up
-export const CLICKS_BEFORE_RATING = 3;
+// Clicks before the survey shows up, and before it comes back once closed
+export const CLICKS_BEFORE_RATING = 6;
 
 // Where decorations may land: roughly the chair and a bit around it, in pubmat pixels
 export const LANDING = { x: [250, 830], y: [380, 1020] };
