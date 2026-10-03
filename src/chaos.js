@@ -15,6 +15,9 @@ export const MEMBERS = Object.entries(memberFiles).map(([path, src]) => {
   return { name, src, tune: { x: 0, y: 0, scale: 1, ...tuning[name] } };
 });
 
+// Decorations are hidden for now: set to true to bring the button back
+export const SHOW_DECORATIONS = false;
+
 // Decorations pile up around the chair, as many as you like (up to the cap)
 export const DECORATIONS = [
   { emoji: "🎀", size: 170 },

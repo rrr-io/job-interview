@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { CLICKS_BEFORE_RATING, CUTOUT_DENSITY, DECORATIONS, LANDING, MAX_DECORATIONS, MEMBERS, SEAT } from "../chaos";
+import { CLICKS_BEFORE_RATING, CUTOUT_DENSITY, DECORATIONS, LANDING, MAX_DECORATIONS, MEMBERS, SEAT, SHOW_DECORATIONS } from "../chaos";
 import "./Chaos.css";
 import "./Window.css";
 
@@ -128,11 +128,13 @@ export default function Chaos({ onShake, onEngaged, onInteract }) {
             <button className="win-button paint-tool" onClick={swapMember}>
               [ {member ? "ANOTHER MEMBER" : "ENHYPEN"} ]
             </button>
-            <button className="win-button paint-tool" onClick={addDecorations}>
-              [ DECORATIONS ]
-            </button>
+            {SHOW_DECORATIONS && (
+              <button className="win-button paint-tool" onClick={addDecorations}>
+                [ DECORATIONS ]
+              </button>
+            )}
           </div>
-          <div className="win-status">more decorations, more ENGENE compliance</div>
+          <div className="win-status">more ENHYPEN, more ENGENE compliance</div>
         </div>,
         document.body
       )}
