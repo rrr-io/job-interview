@@ -5,6 +5,7 @@ import ChairLabel from "./components/ChairLabel";
 import Eraser from "./components/Eraser";
 import Chaos from "./components/Chaos";
 import ErrorCascade from "./components/ErrorCascade";
+import Feedback from "./components/Feedback";
 import Glitch from "./components/Glitch";
 import Queue from "./components/Queue";
 import RedirectError from "./components/RedirectError";
@@ -29,6 +30,8 @@ export default function App() {
   const labelTimer = useRef(null);
   const skipRef = useRef(false);
   const [painted, setPainted] = useState(false);
+  const [finale, setFinale] = useState("chaos"); // chaos | rating | rated
+  const [surveyOpen, setSurveyOpen] = useState(true);
   const [member, setMember] = useState(null);
 
   useEffect(() => {
@@ -42,6 +45,8 @@ export default function App() {
     setResumeSteps(RESUME_STEPS);
     setClosing(false);
     setPainted(false);
+    setFinale("chaos");
+    setSurveyOpen(true);
 
     // Dev shortcut: ?skip=customize jumps straight to the empty chair
     if (run === 0 && new URLSearchParams(window.location.search).get("skip") === "customize") {
@@ -151,6 +156,9 @@ export default function App() {
   }, []);
 
   const handlePainted = useCallback(() => setPainted(true), []);
+  const handleRated = useCallback(() => setFinale("rated"), []);
+  // Closing the survey only lasts until the next click on the paint tools, like real surveys
+  const reopenSurvey = useCallback(() => setTimeout(() => setSurveyOpen(true), 700), []);
   const shakeOnce = useCallback(() => {
     setShake(true);
     setTimeout(() => setShake(false), 420);
@@ -196,7 +204,16 @@ export default function App() {
 
         {phase === "applied" && flagged && <WorkspacePopup onCustomize={customize} />}
 
-        {phase === "clean" && <Chaos onShake={shakeOnce} />}
+        {phase === "clean" && <Chaos onShake={shakeOnce} onEngaged={() => setFinale("rating")} onInteract={reopenSurvey} />}
+        {phase === "clean" && finale !== "chaos" && (
+          <Feedback
+            open={surveyOpen}
+            rated={finale === "rated"}
+            onRated={handleRated}
+            onReplay={() => setRun((r) => r + 1)}
+            onClose={() => setSurveyOpen(false)}
+          />
+        )}
       </div>
     </main>
   );

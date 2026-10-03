@@ -1,0 +1,132 @@
+/* Docked to the top of the screen, so the paint tools below keep working */
+.feedback {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: calc(10px + env(safe-area-inset-top, 0px));
+  z-index: 30;
+  width: min(460px, calc(100vw - 20px));
+  margin: 0 auto;
+}
+
+/* Closed, but kept mounted so the rating is still there when it comes back */
+.feedback.closed {
+  display: none;
+}
+
+.feedback p {
+  margin: 0;
+}
+
+.feedback-message {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.feedback-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  color: #729fcf;
+  border: 1.5px solid currentColor;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.feedback-icon.ok {
+  color: #8ae234;
+}
+
+.finale-title {
+  color: #fff;
+  font-weight: 700;
+}
+
+.finale-body {
+  color: #8a8a8a;
+}
+
+.feedback-stars {
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+  margin-top: 6px;
+}
+
+.feedback-stars.wiggle {
+  animation: stars-wiggle 0.35s ease-in-out;
+}
+
+.feedback-star {
+  padding: 0 2px;
+  background: none;
+  border: 0;
+  color: #3a3a3a;
+  font-size: 30px;
+  line-height: 1.1;
+  cursor: pointer;
+  transition:
+    color 0.15s,
+    transform 0.25s cubic-bezier(0.3, 1.8, 0.5, 1);
+}
+
+.feedback-star.on {
+  color: #fce94f;
+  text-shadow: 0 0 8px rgba(252, 233, 79, 0.45);
+  transform: scale(1.1);
+}
+
+@keyframes stars-wiggle {
+  25% {
+    transform: translateX(-4%);
+  }
+  75% {
+    transform: translateX(4%);
+  }
+}
+
+/* The dialog grows to reveal the contacts */
+.feedback-more {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.4s ease;
+}
+
+.feedback-more.open {
+  grid-template-rows: 1fr;
+}
+
+.feedback-more > div {
+  overflow: hidden;
+}
+
+.feedback-since {
+  margin-top: 8px !important;
+  padding-top: 8px;
+  border-top: 1px solid #262626;
+  color: #d8d8d8;
+  text-align: center;
+}
+
+.feedback-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.feedback-links .win-button {
+  text-transform: uppercase;
+}
+
+/* The official logos are black: invert them to sit on the dark window */
+.feedback-links img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  filter: invert(1);
+}
