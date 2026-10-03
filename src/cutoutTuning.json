@@ -2,22 +2,22 @@
   "membercut1.PNG": {
     "x": 1,
     "y": -43,
-    "scale": 1.06
+    "scale": 1.15
   },
   "membercut10.PNG": {
     "x": 0,
     "y": 0,
-    "scale": 1.37
+    "scale": 1.43
   },
   "membercut11.PNG": {
     "x": 0,
     "y": 0,
-    "scale": 1.32
+    "scale": 1.37
   },
   "membercut12.PNG": {
     "x": 0,
     "y": 0,
-    "scale": 0.89
+    "scale": 0.91
   },
   "membercut13.PNG": {
     "x": 21,
@@ -30,9 +30,9 @@
     "scale": 1.27
   },
   "membercut15.PNG": {
-    "x": -11,
-    "y": 317,
-    "scale": 1.27
+    "x": -6,
+    "y": 353,
+    "scale": 1.32
   },
   "membercut16.PNG": {
     "x": 8,
@@ -42,12 +42,12 @@
   "membercut17.PNG": {
     "x": -10,
     "y": -25,
-    "scale": 1.17
+    "scale": 1.19
   },
   "membercut18.PNG": {
     "x": -2,
     "y": -16,
-    "scale": 1.27
+    "scale": 1.37
   },
   "membercut19.PNG": {
     "x": 37,
@@ -57,17 +57,17 @@
   "membercut2.PNG": {
     "x": -8,
     "y": 16,
-    "scale": 1.1
+    "scale": 1.12
   },
   "membercut20.PNG": {
-    "x": 108,
-    "y": 283,
-    "scale": 1.2
+    "x": 110,
+    "y": 295,
+    "scale": 1.22
   },
   "membercut21.PNG": {
     "x": -61,
-    "y": 46,
-    "scale": 1.27
+    "y": 67,
+    "scale": 1.3
   },
   "membercut22.PNG": {
     "x": 15,
@@ -100,8 +100,8 @@
     "scale": 1.17
   },
   "membercut28.PNG": {
-    "x": 109,
-    "y": -122,
+    "x": 112,
+    "y": -78,
     "scale": 1.22
   },
   "membercut29.PNG": {
@@ -110,9 +110,9 @@
     "scale": 1.29
   },
   "membercut3.PNG": {
-    "x": -29,
-    "y": -12,
-    "scale": 1.2
+    "x": -55,
+    "y": 25,
+    "scale": 1.27
   },
   "membercut30.PNG": {
     "x": 32,
@@ -122,17 +122,17 @@
   "membercut31.PNG": {
     "x": -38,
     "y": -56,
-    "scale": 1.1
+    "scale": 1.14
   },
   "membercut32.PNG": {
     "x": 0,
     "y": 173,
-    "scale": 1.27
+    "scale": 1.3
   },
   "membercut33.PNG": {
-    "x": 43,
-    "y": 56,
-    "scale": 1.22
+    "x": 48,
+    "y": 63,
+    "scale": 1.24
   },
   "membercut34.PNG": {
     "x": 32,
@@ -142,36 +142,36 @@
   "membercut35.PNG": {
     "x": -6,
     "y": -53,
-    "scale": 1.06
+    "scale": 1.08
   },
   "membercut4.PNG": {
     "x": -7,
     "y": -73,
-    "scale": 1.1
+    "scale": 1.12
   },
   "membercut5.PNG": {
     "x": -10,
     "y": -55,
-    "scale": 1.2
+    "scale": 1.25
   },
   "membercut6.PNG": {
-    "x": -66,
-    "y": 312,
-    "scale": 1.2
+    "x": -85,
+    "y": 345,
+    "scale": 1.3
   },
   "membercut7.PNG": {
     "x": 5,
     "y": -43,
-    "scale": 0.98
+    "scale": 1.06
   },
   "membercut8.PNG": {
     "x": 19,
     "y": -54,
-    "scale": 1.15
+    "scale": 1.22
   },
   "membercut9.PNG": {
     "x": 10,
     "y": 182,
-    "scale": 1.02
+    "scale": 1.04
   }
 }
