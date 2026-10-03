@@ -42,6 +42,13 @@ export default function App() {
     setClosing(false);
     setPainted(false);
 
+    // Dev shortcut: ?skip=customize jumps straight to the empty chair
+    if (run === 0 && new URLSearchParams(window.location.search).get("skip") === "customize") {
+      setPainted(true);
+      setPhase("clean");
+      return;
+    }
+
     async function breach() {
       await sleep(CONFIG.idleBeforeHack);
       if (cancelled) return;
