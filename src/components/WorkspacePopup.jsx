@@ -11,11 +11,11 @@ export default function WorkspacePopup({ onCustomize }) {
           </svg>
           Workspace configuration incomplete
         </p>
-        <p className="workspace-body">Your seat has been reserved, but it looks painfully boring.</p>
+        <p className="workspace-body"></p>
         <button className="workspace-action" onClick={onCustomize} autoFocus>
-          [ CUSTOMIZE YOUR SEAT ]
+          CUSTOMIZE YOUR SEAT
         </button>
-        <p className="workspace-note">Optional. Unfortunately.</p>
+        <p className="workspace-note"></p>
       </div>
     </div>
   );
