@@ -55,7 +55,7 @@ export default function Feedback({ open = true, rated, onRated, onReplay, onClos
             {enhanced ? (
               <>
                 <p className="finale-title">6/6. Excellent taste.</p>
-                <p className="finale-body">Your feedback has been slightly enhanced.</p>
+                <p className="finale-body">Your feedback might ot might not been slightly enhanced.</p>
               </>
             ) : (
               <>
