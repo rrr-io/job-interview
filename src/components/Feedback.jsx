@@ -104,7 +104,7 @@ export default function Feedback({ open = true, rated, onRated, onReplay, onClos
                 REPLAY
               </button>
             </div>
-            <p className="feedback-thanks">Thank you for always supporting ENHYPEN and inspiring ENGENE, whether I get the seat or not. 🤍</p>
+            <p className="feedback-thanks">EMGP organizers, thank you for always supporting ENHYPEN and inspiring ENGENE, whether I get the seat or not. 🤍</p>
           </div>
         </div>
       </div>
