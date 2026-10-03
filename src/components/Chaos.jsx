@@ -11,7 +11,7 @@ const pct = (value, total) => `${(value / total) * 100}%`;
 
 // Member cutouts get their size from the image itself, so faces match across photos
 const widths = new Map();
-const naturalWidth = (src) => {
+export const naturalWidth = (src) => {
   if (!widths.has(src)) {
     widths.set(
       src,
@@ -26,7 +26,7 @@ const naturalWidth = (src) => {
   return widths.get(src);
 };
 
-function Thing({ item, className = "" }) {
+export function Thing({ item, className = "" }) {
   return (
     <span
       className={`chaos-item chaos-${item.entrance} ${className}`}
@@ -51,6 +51,12 @@ function Thing({ item, className = "" }) {
 }
 
 // One member on the chair at a time, plus a growing pile of decorations
+// Seat position and size for a member, with its tuning applied
+export async function placeMember(member) {
+  const size = ((await naturalWidth(member.src)) / CUTOUT_DENSITY) * member.tune.scale;
+  return { ...member, size, x: SEAT.x + member.tune.x, y: SEAT.y + member.tune.y, rotate: 0 };
+}
+
 export default function Chaos({ onShake, onEngaged, onInteract }) {
   const [member, setMember] = useState(null);
   const [leaving, setLeaving] = useState(null);
@@ -69,12 +75,12 @@ export default function Chaos({ onShake, onEngaged, onInteract }) {
     const others = MEMBERS.filter((m) => m.src !== member?.src);
     const next = pick(others);
     engage();
-    const size = (await naturalWidth(next.src)) / CUTOUT_DENSITY;
+    const placed = await placeMember(next);
     if (member) {
       setLeaving(member);
       setTimeout(() => setLeaving(null), 450);
     }
-    setMember({ ...next, size, id: ++count.current, x: between(SEAT.x), y: between(SEAT.y), rotate: between([-6, 6]), entrance: "drop" });
+    setMember({ ...placed, id: ++count.current, entrance: "drop" });
   };
 
   const addDecorations = () => {

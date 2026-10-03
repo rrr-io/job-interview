@@ -1,0 +1,62 @@
+.page.calibrate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  overflow: auto;
+}
+
+.page.calibrate .pubmat {
+  flex: none;
+  width: min(100vw - 20px, 55svh * 0.8);
+  touch-action: none;
+  cursor: grab;
+  outline: 1px dashed #ccc;
+}
+
+.calibrate-seat {
+  position: absolute;
+  left: 25%;
+  right: 25%;
+  border-top: 2px dashed #8ae234;
+  pointer-events: none;
+}
+
+.calibrate-panel {
+  width: min(560px, 100%);
+}
+
+.calibrate-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.calibrate-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.calibrate-row .win-button {
+  flex: 1;
+}
+
+.calibrate-hint {
+  margin: 0;
+  color: #8a8a8a;
+  font-size: 11px;
+}
+
+.calibrate-json {
+  height: 90px;
+  padding: 6px;
+  background: #000;
+  color: #8ae234;
+  border: 1px solid #333;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 11px;
+  resize: vertical;
+}
