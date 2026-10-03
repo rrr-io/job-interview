@@ -81,8 +81,6 @@ export const RESUME_STEPS = [
   { out: "ERROR: workspace does not meet minimum ENGENE requirements", tone: "err" },
   { out: "Missing dependencies:" },
   { out: "  - enhypen" },
-  { out: "  - bows" },
-  { out: "  - unnecessary-decorations" },
   { out: "Manual configuration required." },
   { pause: 600, effect: "flag" },
 ];
